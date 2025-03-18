@@ -21,7 +21,7 @@ const pathLessons = [
 const Lessons = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
   return (
-    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center">
+    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center" bg={useColorModeValue("gray.100", "v")}>
       {pathLessons.map((lesson) => {
         const exercises = pathExercice.filter(ex => ex.idLesson === lesson.id);
         return (
