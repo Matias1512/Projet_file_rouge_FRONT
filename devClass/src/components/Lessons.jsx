@@ -1,6 +1,6 @@
+import { Box, VStack, Text, Icon, Flex, useColorModeValue } from "@chakra-ui/react";
+import { FaHome, FaVolumeUp, FaDumbbell, FaTrophy, FaGift, FaShoppingBag, FaUser, FaPlus, FaBook, FaStar } from "react-icons/fa";
 import React, { useState } from "react";
-import { Box, VStack, Text, Icon, Flex } from "@chakra-ui/react";
-import { FaBook, FaStar, FaDumbbell } from "react-icons/fa";
 
 const pathExercice = [
   { id: 1, idLesson: 1, title: "Titre1", icon: FaStar, description: "COMMENCER", locked: false },
@@ -18,47 +18,36 @@ const pathLessons = [
   { id: 2, title: "Lesson2", description: "PYTHON", color: "orange.400" }
 ];
 
-export default function Lessons() {
+const Lessons = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
-
   return (
-    <Box minH="100vh" bg="gray.50" p={6} display="flex" flexDirection="column" alignItems="center">
-      {/* Parcours toutes les lessons */}
+    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center">
       {pathLessons.map((lesson) => {
         const exercises = pathExercice.filter(ex => ex.idLesson === lesson.id);
-
         return (
           <Box key={lesson.id} w="full" mb={10}>
-            {/* Bandeau de la lesson */}
-            <Box w="full" bg={lesson.color} p={4} borderRadius="lg" textAlign="center" color="white">
+            <Box w="full" bg={lesson.color} p={4} borderRadius="lg" textAlign="center" color={"white"}>
               <Text fontSize="lg" fontWeight="bold">{lesson.title.toUpperCase()}</Text>
               <Text fontSize="xl">{lesson.description}</Text>
             </Box>
-
-            {/* Liste des exercices liés */}
             <VStack spacing={6} mt={6} align="center">
               {exercises.map((item) => (
                 <Flex key={item.id} align="center" direction="row" position="relative">
-                  
-                  {/* Affichage de la description en cas de survol */}
-                  {hoveredItem === item.id && (
-                    <Box
-                      position="absolute"
-                      right="-170px"
-                      bg="gray.700"
-                      color="white"
-                      p={2}
-                      borderRadius="md"
-                      width="150px"
-                      textAlign="center"
-                      fontSize="sm"
-                      zIndex="1"
-                    >
-                      {item.description}
-                    </Box>
-                  )}
-
-                  {/* Icône de l'exercice */}
+                    {hoveredItem === item.id && (
+                        <Box
+                        position="absolute"
+                        right="-170px"
+                        bg={lesson.color}
+                        color={"white"}
+                        p={2}
+                        borderRadius="md"
+                        width="150px"
+                        textAlign="center"
+                        zIndex="1"
+                        >
+                        {item.description}
+                        </Box>
+                    )}
                   <Box
                     w={12} h={12} display="flex" alignItems="center" justifyContent="center"
                     borderRadius="full" bg={item.locked ? "gray.300" : "blue.400"}
@@ -75,4 +64,6 @@ export default function Lessons() {
       })}
     </Box>
   );
-}
+};
+
+export { Lessons };
