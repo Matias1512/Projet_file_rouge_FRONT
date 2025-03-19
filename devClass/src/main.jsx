@@ -10,7 +10,4 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <App />
   </>,
-  // <React.StrictMode>
-    
-  // </React.StrictMode>
 );

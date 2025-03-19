@@ -4,6 +4,7 @@ import CodeEditor from "./components/CodeEditor"
 import { ChakraProvider } from "@chakra-ui/react";
 import { LayoutNavBar } from "./components/NavBar";
 import { Lessons } from "./components/Lessons";
+import AchievementsPage from "./components/Badges";
 
 function App() {
 
@@ -13,7 +14,7 @@ function App() {
     // </Box>
     <ChakraProvider>
       <LayoutNavBar>
-        <Lessons /> 
+        <AchievementsPage /> 
       </LayoutNavBar>
     </ChakraProvider>
   )
