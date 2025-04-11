@@ -61,21 +61,35 @@ const AchievementLocked = ({ achievement, onUnlock }) => {
 
 const AchievementsPage = () => {
   const toast = useToast();
-  const [achievements, setAchievements] = useState([
-    { id: "streak", title: "Tout feu tout flamme", description: "Réaliser une série de 50 jours", icon: <FaFire size={32} />, level: 5, color: "red.500", current: 35, total: 50, unlocked: true },
-    { id: "xp", title: "Puits de science", description: "Gagner 4000 XP", icon: <FaFlask size={32} />, level: 6, color: "green.500", current: 3555, total: 4000, unlocked: true },
-    { id: "words", title: "Spécialiste", description: "Apprendre 350 nouveaux mots", icon: <FaFileAlt size={32} />, level: 5, color: "red.500", current: 315, total: 350, unlocked: true },
-    { id: "division", title: "Redoutable", description: "Rejoindre la Division Saphir", icon: <FaShieldAlt size={32} />, level: 4, color: "purple.500", current: 3, total: 4, unlocked: true },
-    { id: "perfect", title: "Sans-faute", description: "Terminer 100 leçons sans faute", icon: <FaBullseye size={32} />, level: 5, color: "green.500", current: 61, total: 100, unlocked: true },
-    { id: "gold", title: "Médaille d'or", description: "Terminer 1er dans la ligue", icon: <FaTrophy size={32} />, level: 1, color: "purple.500", current: 0, total: 1, unlocked: true },
-    { id: "speed", title: "Éclair de génie", description: "Compléter 10 leçons en moins de 2 min", icon: <FaBolt size={32} />, level: 3, color: "yellow.500", current: 0, total: 10, unlocked: false, unlockRequirement: "Atteindre le niveau 5" },
-    { id: "master", title: "Maître linguiste", description: "Atteindre le niveau max dans 3 compétences", icon: <FaStar size={32} />, level: 7, color: "blue.500", current: 0, total: 3, unlocked: false, unlockRequirement: "Compléter 'Spécialiste'" },
-  ]);
+  const [achievements, setAchievements] = useState([]);
 
-  const unlockAchievement = (id) => {
-    setAchievements(prev => prev.map(a => a.id === id ? { ...a, unlocked: true } : a));
-    toast({ title: "Succès débloqué!", description: "Vous avez débloqué un nouveau succès!", status: "success", duration: 2000, isClosable: true });
-  };
+  useEffect(() => {
+    axios.get("https://schooldev.duckdns.org/api/badges")
+      .then(response => {
+        const badges = response.data.map((badge, index) => ({
+          id: badge.badgeId || index, // fallback au cas où badgeId est manquant
+          title: badge.name,
+          description: badge.description,
+          icon: <FaStar size={32} />, // 🔁 remplace par une logique plus spécifique si tu as plusieurs icônes
+          level: 1, // à adapter si tu as un niveau à afficher
+          color: "blue.500", // idem
+          current: 0,
+          total: 1,
+          unlocked: false // ou logique future si tu veux gérer ça par utilisateur
+        }));
+        setAchievements(badges);
+      })
+      .catch(error => {
+        console.error("Erreur lors du chargement des badges :", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les succès.",
+          status: "error",
+          duration: 3000,
+          isClosable: true
+        });
+      });
+  }, []);
 
   return (
     <Container maxW="3xl" py={8}>
