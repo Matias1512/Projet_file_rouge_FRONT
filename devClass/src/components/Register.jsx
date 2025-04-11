@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, VStack, Heading, IconButton, Flex, useToast } from "@chakra-ui/react";
 import axios from "axios";
+import { useAuth } from "../AuthContext";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -12,6 +13,14 @@ const Register = () => {
   const [loading, setLoading] = useState(false); // Ajout d'un état pour gérer le chargement
   const navigate = useNavigate();
   const toast = useToast(); // Pour afficher des messages de succès ou d'erreur
+  const { isAuthenticated } = useAuth(); // Assurez-vous d'importer le contexte d'authentification
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,7 +74,7 @@ const Register = () => {
                     _hover={{ bg: "#2da8dd" }}
                     onClick={() => navigate("/login")} // Redirection vers la page se connecter
                 >
-                S'inscrire
+                Se connecter
                 </Button>
             </Flex>
 
@@ -86,6 +95,7 @@ const Register = () => {
             _placeholder={{ color: "gray.400" }}
             _focus={{ borderColor: "#39b4e9", boxShadow: "0 0 0 1px #39b4e9" }}
             size="lg"
+            required
           />
 
           <Input
@@ -98,6 +108,7 @@ const Register = () => {
             _placeholder={{ color: "gray.400" }}
             _focus={{ borderColor: "#39b4e9", boxShadow: "0 0 0 1px #39b4e9" }}
             size="lg"
+            required
           />
 
           <Box position="relative" w="full">
@@ -112,6 +123,7 @@ const Register = () => {
               _focus={{ borderColor: "#39b4e9", boxShadow: "0 0 0 1px #39b4e9" }}
               size="lg"
               pr="3rem" // Ajoute de l'espace pour le bouton d'affichage
+              required
             />
             <IconButton
               position="absolute"

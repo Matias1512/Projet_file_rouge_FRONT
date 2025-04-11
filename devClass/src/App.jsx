@@ -1,8 +1,6 @@
-import { Box } from "@chakra-ui/react"
-import CodeEditor from "./components/CodeEditor"
-import { BrowserRouter as Router, Routes, Route, useLocation  } from "react-router-dom";
-import { AuthProvider } from "./AuthContext";
-import PrivateRoute from "./PrivateRoute";
+import { Box } from "@chakra-ui/react";
+import CodeEditor from "./components/CodeEditor";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -12,24 +10,42 @@ import { LayoutNavBar } from "./components/NavBar";
 import { Lessons } from "./components/Lessons";
 import AchievementsPage from "./components/Badges";
 
+import { AuthProvider } from "./AuthContext"; // ✅ Ton contexte d'authentification
+import PrivateRoute from "./PrivateRoute"; // ✅ Pour protéger les routes privées
+
 function AppContent() {
   const location = useLocation();
-  const showNavbar = location.pathname !== "/login" && location.pathname !== "/register"; // Ne pas afficher sur /login
- 
   return (
     <>
-      {showNavbar && <LayoutNavBar />}
       <Routes>
-        {/* Page publique */}
+        {/* Pages publiques */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Page protégée */}
+        {/* Pages protégées */}
         <Route
           path="/"
           element={
             <PrivateRoute>
-              <AchievementsPage />
+              <LayoutNavBar>
+                <AchievementsPage /> 
+              </LayoutNavBar>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/editor"
+          element={
+            <PrivateRoute>
+              <CodeEditor />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lessons"
+          element={
+            <PrivateRoute>
+              <Lessons />
             </PrivateRoute>
           }
         />
@@ -40,14 +56,14 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <ChakraProvider>
+    <ChakraProvider>
+      <AuthProvider> {/* ✅ AuthProvider doit entourer AppContent */}
         <Router>
           <AppContent />
         </Router>
-      </ChakraProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ChakraProvider>
   );
 }
 
-export default App
+export default App;

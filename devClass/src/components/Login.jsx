@@ -1,4 +1,5 @@
 import { useAuth } from "../AuthContext";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Box, Button, Input, VStack, Heading, Flex, useToast } from "@chakra-ui/react";
@@ -9,13 +10,16 @@ function Login() {
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const toast = useToast(); // Pour afficher des messages de succès ou d'erreur
-    const userData = {
-      "username": name,
-      "password": password
-    };
+    
+    useEffect(() => {
+      if (isAuthenticated) {
+        navigate("/");
+      }
+    }, [isAuthenticated]);
+    
     const handleLogin = async (e) => {
       e.preventDefault();
       setLoading(true);
@@ -93,6 +97,7 @@ function Login() {
                 _placeholder={{ color: "gray.400" }}
                 _focus={{ borderColor: "#39b4e9", boxShadow: "0 0 0 1px #39b4e9" }}
                 size="lg"
+                required
               />
     
               <Input
@@ -105,6 +110,7 @@ function Login() {
                 _placeholder={{ color: "gray.400" }}
                 _focus={{ borderColor: "#39b4e9", boxShadow: "0 0 0 1px #39b4e9" }}
                 size="lg"
+                required
               />
     
               <Button
