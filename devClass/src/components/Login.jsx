@@ -2,40 +2,57 @@ import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Box, Button, Input, VStack, Heading, Flex, useToast } from "@chakra-ui/react";
+import axios from "axios";
 
 function Login() {
 
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
     const [password, setPassword] = useState("");
-
+    const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
     const toast = useToast(); // Pour afficher des messages de succès ou d'erreur
-
-    const handleLogin = async () => {
-        try {
-            const response = await fetch(
-                `https://schooldev.duckdns.org/api/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
-                { method: "GET" }
-            );
-    
-            if (!response.ok) {
-                throw new Error("Échec de la connexion. Vérifie tes identifiants.");
-            }
-    
-            const userData = await response.json();
-            login(userData); // Stocker les données réelles de l'utilisateur
-            navigate("/"); // Redirection après connexion
-        } catch (error) {
-            console.error("Erreur de connexion :", error.message);
-            toast({
-                title: "Erreur",
-                description: error.message,
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-              });
+    const userData = {
+      "username": name,
+      "password": password
+    };
+    const handleLogin = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+  
+      const userData = {
+        username: name,
+        password: password
+      };
+  
+      try {
+        const response = await axios.post("https://schooldev.duckdns.org/api/auth/login", userData);
+        const token = response.data.token;
+  
+        if (token) {
+          login(token); // 📌 stocke le token dans le contexte et le localStorage
+          toast({
+            title: "Connexion réussie !",
+            description: "Bienvenue 🥳",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          navigate("/");
+        } else {
+          throw new Error("Token manquant dans la réponse.");
         }
+      } catch (error) {
+        toast({
+          title: "Erreur",
+          description: error.response?.data?.message || error.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
     return (
@@ -68,9 +85,9 @@ function Login() {
             <VStack as="form" onSubmit={handleLogin} spacing={4}>
               <Input
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="E-mail"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="username"
                 bg="#1e2730"
                 color="white"
                 _placeholder={{ color: "gray.400" }}
@@ -97,6 +114,8 @@ function Login() {
                 color="black"
                 size="lg"
                 _hover={{ bg: "#2da8dd" }}
+                mt={2}
+                isLoading={loading} // Affiche le spinner pendant l'envoi des données
               >
                 SE CONNECTER
               </Button>

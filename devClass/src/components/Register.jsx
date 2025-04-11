@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, VStack, Heading, IconButton, Flex, useToast } from "@chakra-ui/react";
+import axios from "axios";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -17,21 +18,13 @@ const Register = () => {
     setLoading(true); // Met l'état de chargement à vrai
     console.log("Nom:", name, "Email:", email, "Password:", password);
     const userData = {
-      username: name,
-      email,
-      passwordHash: password, // Envoi du mot de passe sous "passwordHash"
+      "username": name,
+      "email": email,
+      "passwordHash": password,
+      "role": "user" // Envoi du mot de passe sous "passwordHash"
     };
-
-    try {
-      const response = await fetch("https://schooldev.duckdns.org/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (response.ok) {
+    axios.post("https://schooldev.duckdns.org/api/auth/register", userData)
+      .then(response => {
         toast({
           title: "Inscription réussie !",
           description: "Tu peux maintenant te connecter.",
@@ -39,22 +32,20 @@ const Register = () => {
           duration: 3000,
           isClosable: true,
         });
-        navigate("/login"); // Redirige vers la page de connexion après une inscription réussie
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Une erreur est survenue.");
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
-      setLoading(false); // Met l'état de chargement à faux après l'appel
-    }
+        navigate("/login");
+      })
+      .catch(error => {
+        toast({
+          title: "Erreur",
+          description: error.response?.data?.message || "Une erreur est survenue.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      }); // Met l'état de chargement à faux après la requête
   };
 
   return (
