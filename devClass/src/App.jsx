@@ -1,12 +1,12 @@
 import { Box } from "@chakra-ui/react";
 import CodeEditor from "./components/CodeEditor";
+import LayoutWithNavbar from "./components/LayoutWithNavbar";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Login from "./components/Login";
 import Register from "./components/Register";
 
 import { ChakraProvider } from "@chakra-ui/react";
-import { LayoutNavBar } from "./components/NavBar";
 import { Lessons } from "./components/Lessons";
 import AchievementsPage from "./components/Badges";
 
@@ -15,42 +15,46 @@ import PrivateRoute from "./PrivateRoute"; // ✅ Pour protéger les routes priv
 
 function AppContent() {
   const location = useLocation();
+  const hideNavbar = location.pathname === "/login" || location.pathname === "/register";
+  
   return (
     <>
-      <Routes>
-        {/* Pages publiques */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <Routes>
+      {/* Pages publiques */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        {/* Pages protégées */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <LayoutNavBar>
-                <AchievementsPage /> 
-              </LayoutNavBar>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/editor"
-          element={
-            <PrivateRoute>
-              <CodeEditor />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/lessons"
-          element={
-            <PrivateRoute>
-              <Lessons />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
-    </>
+      {/* Routes avec nav intégrée */}
+      {!hideNavbar && (
+        <Route element={<LayoutWithNavbar />}>
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <AchievementsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editor"
+            element={
+              <PrivateRoute>
+                <CodeEditor />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/lessons"
+            element={
+              <PrivateRoute>
+                <Lessons />
+              </PrivateRoute>
+            }
+          />
+        </Route>
+      )}
+    </Routes>
+  </>
   );
 }
 
