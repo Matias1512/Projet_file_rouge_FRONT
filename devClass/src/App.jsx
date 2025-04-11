@@ -1,23 +1,73 @@
-import { Box } from "@chakra-ui/react"
-import CodeEditor from "./components/CodeEditor"
+import { Box } from "@chakra-ui/react";
+import CodeEditor from "./components/CodeEditor";
+import LayoutWithNavbar from "./components/LayoutWithNavbar";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 import { ChakraProvider } from "@chakra-ui/react";
-import { LayoutNavBar } from "./components/NavBar";
 import { Lessons } from "./components/Lessons";
 import AchievementsPage from "./components/Badges";
 
-function App() {
+import { AuthProvider } from "./AuthContext"; // ✅ Ton contexte d'authentification
+import PrivateRoute from "./PrivateRoute"; // ✅ Pour protéger les routes privées
 
+function AppContent() {
+  const location = useLocation();
+  const hideNavbar = location.pathname === "/login" || location.pathname === "/register";
+  
   return (
-    // <Box minH="100vh" bg="#0f0a19" color="gray.500" px={6} py={8}>
-    // <CodeEditor />
-    // </Box>
-    <ChakraProvider>
-      <LayoutNavBar>
-        <AchievementsPage /> 
-      </LayoutNavBar>
-    </ChakraProvider>
-  )
+    <>
+    <Routes>
+      {/* Pages publiques */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Routes avec nav intégrée */}
+      {!hideNavbar && (
+        <Route element={<LayoutWithNavbar />}>
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <AchievementsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editor"
+            element={
+              <PrivateRoute>
+                <CodeEditor />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/lessons"
+            element={
+              <PrivateRoute>
+                <Lessons />
+              </PrivateRoute>
+            }
+          />
+        </Route>
+      )}
+    </Routes>
+  </>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <ChakraProvider>
+      <AuthProvider> {/* ✅ AuthProvider doit entourer AppContent */}
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </ChakraProvider>
+  );
+}
+
+export default App;
