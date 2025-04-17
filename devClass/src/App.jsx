@@ -7,7 +7,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 
 import { ChakraProvider } from "@chakra-ui/react";
-import { Lessons } from "./components/Lessons";
+import Lessons from "./components/Lessons";
+import Home from "./components/Home";
 import AchievementsPage from "./components/Badges";
 
 import { AuthProvider } from "./AuthContext"; // ✅ Ton contexte d'authentification
@@ -32,6 +33,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <AchievementsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              <PrivateRoute>
+                <Home />
               </PrivateRoute>
             }
           />

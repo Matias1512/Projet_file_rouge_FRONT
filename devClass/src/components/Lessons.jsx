@@ -1,4 +1,4 @@
-import { Box, VStack, Text, Icon, Flex, useColorModeValue } from "@chakra-ui/react";
+import { Box, VStack, Text, Icon, Flex, Button, useColorModeValue } from "@chakra-ui/react";
 import { FaHome, FaVolumeUp, FaDumbbell, FaTrophy, FaGift, FaShoppingBag, FaUser, FaPlus, FaBook, FaStar } from "react-icons/fa";
 import React, { useState } from "react";
 
@@ -20,8 +20,9 @@ const pathLessons = [
 
 const Lessons = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
+  
   return (
-    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center" bg={useColorModeValue("gray.100", "v")}>
+    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center" bg={useColorModeValue("gray.100", "gray.700")}>
       {pathLessons.map((lesson) => {
         const exercises = pathExercice.filter(ex => ex.idLesson === lesson.id);
         return (
@@ -33,21 +34,21 @@ const Lessons = () => {
             <VStack spacing={6} mt={6} align="center">
               {exercises.map((item) => (
                 <Flex key={item.id} align="center" direction="row" position="relative">
-                    {hoveredItem === item.id && (
-                        <Box
-                        position="absolute"
-                        right="-170px"
-                        bg={lesson.color}
-                        color={"white"}
-                        p={2}
-                        borderRadius="md"
-                        width="150px"
-                        textAlign="center"
-                        zIndex="1"
-                        >
-                        {item.description}
-                        </Box>
-                    )}
+                  {hoveredItem === item.id && (
+                    <Box
+                      position="absolute"
+                      right="-170px"
+                      bg={lesson.color}
+                      color={"white"}
+                      p={2}
+                      borderRadius="md"
+                      width="150px"
+                      textAlign="center"
+                      zIndex="1"
+                    >
+                      {item.description}
+                    </Box>
+                  )}
                   <Box
                     w={12} h={12} display="flex" alignItems="center" justifyContent="center"
                     borderRadius="full" bg={item.locked ? "gray.300" : "blue.400"}
@@ -59,6 +60,15 @@ const Lessons = () => {
                 </Flex>
               ))}
             </VStack>
+            <Button 
+              mt={6} 
+              bg="green.400" 
+              color="white" 
+              _hover={{ bg: "green.500" }} 
+              size="lg"
+            >
+              COMMENCER
+            </Button>
           </Box>
         );
       })}
@@ -66,4 +76,4 @@ const Lessons = () => {
   );
 };
 
-export { Lessons };
+export default Lessons;

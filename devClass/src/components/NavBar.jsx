@@ -34,7 +34,7 @@ const NavBar = () => {
   return (
     <Box as="nav" w="250px" minH="100vh" p={4} boxShadow="md" bg={colorMode} color={textColor}>
       <VStack spacing={2} align="stretch">
-        <NavItem href="#" icon={FaHome} label="MON COURS" active color={textColor} />
+        <NavItem href="/home" icon={FaHome} label="MON COURS" active color={textColor} />
         <NavItem href="#" icon={FaClock} label="DEFIS" color={textColor} />
         <NavItem href="#" icon={FaUser} label="PROFIL" color={textColor} />
         <NavItem href="#" icon={FaTrophy} label="BADGE" color={textColor} />
