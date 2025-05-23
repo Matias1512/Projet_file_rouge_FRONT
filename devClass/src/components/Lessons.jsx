@@ -20,9 +20,9 @@ const Lessons = () => {
   const exercises = pathExercice.filter(ex => ex.idLesson === 1); // tu peux changer l'ID ici si nécessaire
 
   return (
-    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center">
+    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center" >
       <Box w="full" mb={10}>
-        <Box w="full" bg={lessonColor} p={4} borderRadius="lg" textAlign="center" color={"white"}>
+        <Box w="lg" bg={lessonColor} p={4} borderRadius="lg" margin="auto" textAlign="center" color={"white"}>
           <Text fontSize="lg" fontWeight="bold">JAVA</Text>
           <Text fontSize="xl">Lesson1</Text>
         </Box>
