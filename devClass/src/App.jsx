@@ -29,7 +29,7 @@ function AppContent() {
       {!hideNavbar && (
         <Route element={<LayoutWithNavbar />}>
           <Route
-            path="/"
+            path="/achievements"
             element={
               <PrivateRoute>
                 <AchievementsPage />
@@ -37,7 +37,7 @@ function AppContent() {
             }
           />
           <Route
-            path="/home"
+            path="/"
             element={
               <PrivateRoute>
                 <Home />
