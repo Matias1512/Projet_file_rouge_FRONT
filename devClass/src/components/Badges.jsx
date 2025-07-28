@@ -1,5 +1,6 @@
 import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaRocket, FaStar, FaBolt, FaMedal, FaLock } from "react-icons/fa";
 
 const AchievementCard = ({ achievement }) => {
@@ -62,6 +63,23 @@ const AchievementLocked = ({ achievement, onUnlock }) => {
 const AchievementsPage = () => {
   const toast = useToast();
   const [achievements, setAchievements] = useState([]);
+
+  const unlockAchievement = (id) => {
+    setAchievements(prev => 
+      prev.map(achievement => 
+        achievement.id === id 
+          ? { ...achievement, unlocked: true, current: achievement.total }
+          : achievement
+      )
+    );
+    toast({
+      title: "Succès débloqué !",
+      description: "Félicitations pour ce nouveau succès !",
+      status: "success",
+      duration: 3000,
+      isClosable: true
+    });
+  };
 
   useEffect(() => {
     axios.get("https://schooldev.duckdns.org/api/badges")
