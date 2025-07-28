@@ -102,9 +102,6 @@ function CoursesCard({ course }) {
         bg={cardBg}
         border="2px solid"
         borderColor={languageColor}
-        transform="skewX(-10deg)"
-        transformOrigin="center"
-        clipPath="inset(0)"
       />
       
       <Flex
@@ -115,7 +112,7 @@ function CoursesCard({ course }) {
         justify="center"
         h="100%"
         w="100%"
-        gap={4}
+        gap={6}
       >
         <img
           src="/images/mascotte.png"
@@ -124,22 +121,22 @@ function CoursesCard({ course }) {
           height="350"
         />
 
-        <Heading as="h2" size="md" color={cardText} textAlign="center" fontWeight="bold">
+        <Heading as="h2" size="lg" color={cardText} textAlign="center" fontWeight="bold">
           {course.title}
         </Heading>
 
-        <Box w="60%" display="flex" flexDirection="column" alignItems="center">
-          <Progress value={progressPercentage} size="sm" colorScheme="green" bg="white" w="100%" />
-          <Text color={cardText} fontSize="sm" textAlign="center" mt={1}>
+        <Flex align="center" gap={3} w="300px">
+          <Progress value={progressPercentage} size="md" colorScheme="green" bg="white" flex="1" />
+          <Text color={cardText} fontSize="md" fontWeight="bold">
             0/9
           </Text>
-        </Box>
+        </Flex>
 
         <Button 
           colorScheme="red" 
-          size="sm" 
+          size="md" 
           fontWeight="bold" 
-          px={6}
+          px={8}
           onClick={() => navigate("/lessons")}
         >
           CONTINUER
