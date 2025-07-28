@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import CodeEditor from "./components/CodeEditor";
 import LayoutWithNavbar from "./components/LayoutWithNavbar";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";

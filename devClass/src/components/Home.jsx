@@ -1,35 +1,51 @@
 import { Box, Button, Flex, Grid, Heading, Progress, Text, useColorModeValue } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../AuthContext";
 
 import axios from "axios";
 
-const chapters = [
-  { id: 1, title: "Chapitre 1", progress: 0, total: 8, message: "Les bases!" },
-  { id: 2, title: "Chapitre 2", progress: 2, total: 10, message: "La suite" },
-  { id: 3, title: "Chapitre 3", progress: 0, total: 12, message: "Mdium" },
-  { id: 4, title: "Chapitre 4", progress: 5, total: 8, message: "Expert" },
-]
-
 export default function Home() {
   const [courses, setCourses] = useState([]);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
-  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get('https://schooldev.duckdns.org/api/courses');
+        setCourses(response.data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des cours:', error);
+        if (error.response?.status === 403 || error.response?.status === 401) {
+          logout();
+          navigate('/login');
+        }
+      }
+    };
+
+    fetchCourses();
+  }, [isAuthenticated, logout, navigate]);
 
   const bgPage = useColorModeValue("white", "gray.800");
 
   return (
     <Box minH="100vh" bg={bgPage} py={6} px={4} display="flex" flexDir="column" alignItems="center">
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} w="full" maxW="4xl">
-        {chapters.map((chapter) => (
-          <CoursesCard key={chapter.id} chapter={chapter} />
+        {courses.map((course) => (
+          <CoursesCard key={course.courseId} course={course} />
         ))}
       </Grid>
     </Box>
   )
 }
 
-function CoursesCard({ chapter }) {
+function CoursesCard({ course }) {
   const navigate = useNavigate()
 
   const cardBg = useColorModeValue("gray.50", "gray.900");
@@ -37,12 +53,12 @@ function CoursesCard({ chapter }) {
   const bubbleBg = useColorModeValue("gray.100", "gray.700");
   const bubbleArrow = useColorModeValue("#E2E8F0", "#4A5568");
 
-  const progressPercentage = (chapter.progress / chapter.total) * 100
+  const progressPercentage = 0;
 
   return (
     <Box bg={cardBg} borderRadius="lg" p={6} boxShadow="lg" display="flex" flexDir="column" h="100%">
       <Heading as="h2" size="md" color={cardText} mb={4}>
-        {chapter.title}
+        {course.title}
       </Heading>
 
       <Flex align="center" mb={6}>
@@ -50,7 +66,7 @@ function CoursesCard({ chapter }) {
           <Progress value={progressPercentage} size="sm" colorScheme="green" />
         </Box>
         <Text color={cardText} mr={2}>
-          {chapter.progress}/{chapter.total}
+          0/1
         </Text>
       </Flex>
 
@@ -66,23 +82,23 @@ function CoursesCard({ chapter }) {
             borderRight="10px solid transparent"
             borderTop={`10px solid ${bubbleArrow}`}
           />
-          <Text color={cardText}>{chapter.message}</Text>
+          <Text color={cardText}>Langage: {course.language} - Niveau: {course.difficultyLevel}</Text>
         </Box>
 
         <Flex justify="flex-end">
           <Box w="64px" h="64px">
             <img
-              src="/placeholder.svg"
+              src="/images/mascotte.png"
               alt="Mascotte"
               width="64"
               height="64"
-              style={{ borderRadius: "9999px", backgroundColor: "#84cc16" }}
+              style={{ borderRadius: "9999px" }}
             />
           </Box>
         </Flex>
       </Flex>
 
-      <Button colorScheme="blue" size="lg" fontWeight="bold" w="full" onClick={() => navigate("/lessons")}>
+      <Button colorScheme="red" size="lg" fontWeight="bold" w="full" onClick={() => navigate("/lessons")}>
         CONTINUER
       </Button>
     </Box>

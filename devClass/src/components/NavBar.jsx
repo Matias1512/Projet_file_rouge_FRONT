@@ -15,7 +15,7 @@ const NavItem = ({ href, icon, label, active, color, onClick }) => (
         fontWeight="bold"
         fontSize="sm"
         transition="background-color 0.2s, color 0.2s"
-        bg={active ? "blue.400" : "transparent"}
+        bg={active ? "red.400" : "transparent"}
         color={active ? "light" : color}
         _hover={{ bg: "gray.100", color: "gray.700" }}
         width="100%"
