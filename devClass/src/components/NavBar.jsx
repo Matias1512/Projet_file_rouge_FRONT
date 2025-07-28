@@ -32,7 +32,7 @@ const NavBar = () => {
   const { colorMode, toggleColorMode } = useColorMode()
 
   return (
-    <Box as="nav" w="250px" minH="100vh" p={4} boxShadow="md" bg={colorMode} color={textColor}>
+    <Box as="nav" w="250px" minH="100vh" p={4} boxShadow="md" bg={useColorModeValue("gray.100", "gray.800")} color={textColor}>
       <VStack spacing={2} align="stretch">
         <NavItem href="/" icon={FaHome} label="MON COURS" active color={textColor} />
         <NavItem href="#" icon={FaClock} label="DEFIS" color={textColor} />
