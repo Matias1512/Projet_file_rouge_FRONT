@@ -5,9 +5,9 @@ import { Box, Flex } from "@chakra-ui/react";
 
 const LayoutWithNavbar = () => {
   return (
-    <Flex>
+    <Flex h="100vh" overflow="hidden">
       <LayoutNavBar />
-      <Box flex="1" p={4}>
+      <Box flex="1" p={0} h="100vh" overflow="hidden">
         <Outlet />
       </Box>
     </Flex>

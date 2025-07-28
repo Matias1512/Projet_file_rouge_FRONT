@@ -35,8 +35,8 @@ export default function Home() {
   const bgPage = useColorModeValue("white", "gray.800");
 
   return (
-    <Box minH="100vh" bg={bgPage} py={6} px={4} display="flex" flexDir="column" alignItems="center">
-      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} w="full" maxW="4xl">
+    <Box w="100%" h="100%" bg={bgPage} p={0} overflow="hidden">
+      <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={0} w="100%" h="100%" sx={{ "& > *": { overflow: "visible" } }}>
         {courses.map((course) => (
           <CoursesCard key={course.courseId} course={course} />
         ))}
@@ -48,59 +48,80 @@ export default function Home() {
 function CoursesCard({ course }) {
   const navigate = useNavigate()
 
-  const cardBg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.900");
   const cardText = useColorModeValue("gray.800", "white");
-  const bubbleBg = useColorModeValue("gray.100", "gray.700");
-  const bubbleArrow = useColorModeValue("#E2E8F0", "#4A5568");
-
+  const languageColors = {
+    'JAVA': '#f89500',
+    'PYTHON': '#3776ab',
+    'ANGULAR': '#dd0031',
+    'PHP': '#777bb4'
+  };
+  
+  const languageColor = languageColors[course.language?.toUpperCase()] || '#666';
   const progressPercentage = 0;
 
   return (
-    <Box bg={cardBg} borderRadius="lg" p={6} boxShadow="lg" display="flex" flexDir="column" h="100%">
-      <Heading as="h2" size="md" color={cardText} mb={4}>
-        {course.title}
-      </Heading>
+    <Box 
+      position="relative"
+      h="100%"
+      w="100%"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      overflow="visible"
+    >
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        w="100%"
+        h="100%"
+        bg={cardBg}
+        border="2px solid"
+        borderColor={languageColor}
+        transform="skewX(-10deg)"
+        transformOrigin="center"
+        clipPath="inset(0)"
+      />
+      
+      <Flex
+        position="relative"
+        zIndex={2}
+        direction="column"
+        align="center"
+        justify="center"
+        h="90%"
+        w="90%"
+        gap={4}
+      >
+        <img
+          src="/images/mascotte.png"
+          alt={`${course.language} mascot`}
+          width="550"
+          height="550"
+        />
 
-      <Flex align="center" mb={6}>
-        <Box flex="1" mr={2}>
-          <Progress value={progressPercentage} size="sm" colorScheme="green" />
+        <Heading as="h2" size="md" color={cardText} textAlign="center" fontWeight="bold">
+          {course.language?.toUpperCase() || course.title}
+        </Heading>
+
+        <Box w="60%">
+          <Progress value={progressPercentage} size="sm" colorScheme="green" bg="white" />
+          <Text color={cardText} fontSize="sm" textAlign="center" mt={1}>
+            0/9
+          </Text>
         </Box>
-        <Text color={cardText} mr={2}>
-          0/1
-        </Text>
+
+        <Button 
+          colorScheme="red" 
+          size="sm" 
+          fontWeight="bold" 
+          px={6}
+          onClick={() => navigate("/lessons")}
+        >
+          CONTINUER
+        </Button>
       </Flex>
-
-      <Flex flex="1" direction="column" justify="space-between" mb={6}>
-        <Box position="relative" bg={bubbleBg} p={4} borderRadius="lg" mb={4}>
-          <Box
-            position="absolute"
-            bottom="-10px"
-            right="10px"
-            width="0"
-            height="0"
-            borderLeft="10px solid transparent"
-            borderRight="10px solid transparent"
-            borderTop={`10px solid ${bubbleArrow}`}
-          />
-          <Text color={cardText}>Langage: {course.language} - Niveau: {course.difficultyLevel}</Text>
-        </Box>
-
-        <Flex justify="flex-end">
-          <Box w="64px" h="64px">
-            <img
-              src="/images/mascotte.png"
-              alt="Mascotte"
-              width="64"
-              height="64"
-              style={{ borderRadius: "9999px" }}
-            />
-          </Box>
-        </Flex>
-      </Flex>
-
-      <Button colorScheme="red" size="lg" fontWeight="bold" w="full" onClick={() => navigate("/lessons")}>
-        CONTINUER
-      </Button>
     </Box>
   )
 }
