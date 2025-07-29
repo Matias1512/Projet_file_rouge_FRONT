@@ -38,20 +38,21 @@ jobs:
         cd devClass
         npm run build
         
-  # sonarqube:
-  #   - name: SonarQube Scan
-  #     if: ${{ secrets.SONAR_TOKEN != '' }}
-  #     uses: sonarqube/sonarqube-scan-action@v2.3.0
-  #     with:
-  #       projectBaseDir: ./devClass
-  #       args: >
-  #         -Dsonar.projectKey=schooldev_front
-  #         -Dsonar.sources=src
-  #         -Dsonar.host.url=https://sonarcloud.io
-  #         -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  sonarqube:
+      name: SonarQube
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+          with:
+            fetch-depth: 0 
+        - name: Install dependencies
+          run: yarn
+        - name: Test and coverage
+          run: yarn jest --coverage
+        - name: SonarQube Scan
+          uses: SonarSource/sonarqube-scan-action@v4
+          env:
+            SONAR_TOKEN: ${{ secrets. SONARCLOUD_TOKEN }}
 
   deploy:
     needs: build
