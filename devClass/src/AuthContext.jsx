@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
             headers: { Authorization: `Bearer ${storedToken}` }
           });
           setToken(storedToken);
-        } catch (error) {
+        } catch {
           localStorage.removeItem("token");
           setToken(null);
         }

@@ -42,7 +42,7 @@ AchievementCard.propTypes = {
 };
 
 const AchievementLocked = ({ achievement, onUnlock }) => {
-  const { title, description, icon, level, color, unlockRequirement } = achievement;
+  const { title, description, icon, level, unlockRequirement } = achievement;
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.100" borderStyle="dashed">
       <Flex alignItems="center">
@@ -78,7 +78,6 @@ AchievementLocked.propTypes = {
     description: PropTypes.string.isRequired,
     icon: PropTypes.element.isRequired,
     level: PropTypes.number.isRequired,
-    color: PropTypes.string.isRequired,
     unlockRequirement: PropTypes.string
   }).isRequired,
   onUnlock: PropTypes.func.isRequired

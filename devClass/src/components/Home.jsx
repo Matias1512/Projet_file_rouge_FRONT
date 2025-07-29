@@ -1,4 +1,5 @@
-import { Box, Button, Flex, Grid, Heading, Progress, Text, useColorModeValue } from "@chakra-ui/react"
+import { Box, Button, Flex, Heading, Progress, Text, useColorModeValue } from "@chakra-ui/react"
+import PropTypes from 'prop-types';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../AuthContext";
@@ -147,3 +148,11 @@ function CoursesCard({ course }) {
     </Box>
   )
 }
+
+CoursesCard.propTypes = {
+  course: PropTypes.shape({
+    courseId: PropTypes.number.isRequired,
+    language: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
+  }).isRequired
+};

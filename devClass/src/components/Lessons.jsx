@@ -1,6 +1,6 @@
-import { Box, VStack, Text, Icon, Flex, Button, useColorModeValue } from "@chakra-ui/react";
+import { Box, VStack, Text, Icon, Flex, Button } from "@chakra-ui/react";
 import { FaDumbbell, FaBook, FaStar } from "react-icons/fa";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const pathExercice = [
   { id: 1, idLesson: 1, title: "Titre1", icon: FaStar, description: "COMMENCER", locked: false },
