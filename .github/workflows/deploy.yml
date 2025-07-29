@@ -128,9 +128,18 @@ jobs:
         cache-to: type=gha,mode=max
         
     - name: Deploy to staging server
-      run: |
-        echo "Deploying to staging environment..."
-        # Add your staging deployment commands here
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          cd /home/azureuser/Projet_file_rouge_FRONT
+          git fetch
+          git checkout develop
+          git pull origin develop
+          docker-compose pull frontend-staging
+          docker-compose --profile staging up -d frontend-staging
         
   # Deploy to Production Environment  
   deploy-production:
@@ -178,6 +187,22 @@ jobs:
         cache-to: type=gha,mode=max
         
     - name: Deploy to production server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          cd /home/azureuser/Projet_file_rouge_FRONT
+          git fetch
+          git checkout main
+          git pull origin main
+          docker-compose pull frontend-production
+          docker-compose up -d frontend-production
+        
+    - name: Create deployment notification
       run: |
-        echo "Deploying to production environment..."
-        # Add your production deployment commands here
+        echo "🚀 Successfully deployed to production!"
+        echo "Version: ${{ github.sha }}"
+        echo "Environment: https://schooldev.duckdns.org"
+        echo "Container: schooldev_front_production"
