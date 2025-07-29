@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce pipeline CI/CD implémente les meilleures pratiques d'intégration et déploiement continus pour l'application DevClass.
+Ce pipeline CI/CD implémente les meilleures pratiques d'intégration et déploiement continus pour l'application DevClass sur une VM Azure unique.
 
 ## Architecture du Pipeline
 
@@ -11,7 +11,7 @@ Ce pipeline CI/CD implémente les meilleures pratiques d'intégration et déploi
 **Job: `ci`**
 - ✅ Checkout du code source
 - ✅ Installation des dépendances (npm ci)
-- ✅ Analyse statique (ESLint)
+- ✅ Analyse statique (ESLint)  
 - ✅ Vérification des types (TypeScript)
 - ✅ Tests unitaires et d'intégration
 - ✅ Build de l'application
@@ -27,16 +27,10 @@ Ce pipeline CI/CD implémente les meilleures pratiques d'intégration et déploi
 
 ### 🚀 Déploiement Continu (CD)
 
-#### Staging Environment
-**Job: `deploy-staging`**
-- **Trigger**: Push sur branche `develop`
-- **Environnement**: https://staging.schooldev.duckdns.org
-- **Image Docker**: `matias151/schooldev_front:staging`
-
-#### Production Environment  
-**Job: `deploy-production`**
+**Job: `deploy`**
 - **Trigger**: Push sur branche `main`
 - **Environnement**: https://schooldev.duckdns.org
+- **VM Azure**: Déploiement via SSH
 - **Images Docker**: 
   - `matias151/schooldev_front:latest`
   - `matias151/schooldev_front:{sha}`
@@ -44,30 +38,21 @@ Ce pipeline CI/CD implémente les meilleures pratiques d'intégration et déploi
 ## Workflow des Branches
 
 ```
-feature/xxx → develop → staging environment
-             ↓
-           main → production environment
+feature/xxx → main → VM Azure
 ```
 
 ## Pull Request Workflow
 
 1. **Création PR** → Déclenche CI complète
-2. **Tests passent** → Code review possible
-3. **Merge vers develop** → Déploiement automatique staging
-4. **Validation staging** → Merge vers main
-5. **Merge vers main** → Déploiement automatique production
+2. **Tests passent** → Code review possible  
+3. **Merge vers main** → Déploiement automatique sur VM
 
-## Environnements
+## Environnement
 
-### Staging
-- **URL**: https://staging.schooldev.duckdns.org
-- **Base de données**: Staging DB
-- **Déploiement**: Automatique sur `develop`
-- **Rollback**: Manuel
-
-### Production
-- **URL**: https://schooldev.duckdns.org  
-- **Base de données**: Production DB
+### Production (VM Azure)
+- **URL**: https://schooldev.duckdns.org
+- **Container**: `schooldev_front`
+- **Port**: 80
 - **Déploiement**: Automatique sur `main`
 - **Rollback**: Manuel avec tags Docker
 
