@@ -19,23 +19,24 @@ COPY vite.config.js ./
 RUN npm run build
 
 # Production stage
-  FROM nginx:alpine
+FROM nginx:alpine
 
-  # Create non-root user
-  RUN addgroup -S nonroot \
-      && adduser -S nonroot -G nonroot
+# Copy built application from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
 
-  # Copy built application from build stage
-  COPY --from=build /app/dist /usr/share/nginx/html
+# Create nginx cache directories with proper permissions
+RUN mkdir -p /var/cache/nginx/client_temp \
+    /var/cache/nginx/proxy_temp \
+    /var/cache/nginx/fastcgi_temp \
+    /var/cache/nginx/uwsgi_temp \
+    /var/cache/nginx/scgi_temp \
+    && chmod -R 755 /var/cache/nginx \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /usr/share/nginx/html
 
-  # Change ownership to non-root user
-  RUN chown -R nonroot:nonroot /usr/share/nginx/html
+# Expose port 80
+EXPOSE 80
 
-  # Switch to non-root user
-  USER nonroot
-
-  # Expose port 80
-  EXPOSE 80
-
-  # Start nginx
-  CMD ["nginx", "-g", "daemon off;"]
+# Start nginx as nginx user
+USER nginx
+CMD ["nginx", "-g", "daemon off;"]
