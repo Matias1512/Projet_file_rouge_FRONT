@@ -7,6 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Tests will be implemented with Vitest\" && exit 0",
+    "test:ci": "echo \"Tests will be implemented with Vitest\" && exit 0",
+    "test:coverage": "echo \"Coverage will be implemented with Vitest\" && exit 0",
     "preview": "vite preview"
   },
   "dependencies": {
