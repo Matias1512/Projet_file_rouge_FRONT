@@ -92,7 +92,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
-      url: https://schooldev.duckdns.org
+      url: https://app-schooldev.duckdns.org
     
     steps:
     - name: Checkout code

@@ -5,19 +5,18 @@ services:
   frontend:
     image: matias151/schooldev_front:latest
     container_name: schooldev_front
-    ports:
-      - "3000:80"
     restart: unless-stopped
     networks:
-      - schooldev-network
+      - web
     environment:
       - NODE_ENV=production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`schooldev.duckdns.org`)"
-      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.rule=Host(`app-schooldev.duckdns.org`)"
+      - "traefik.http.routers.frontend.entrypoints=web,websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 networks:
-  schooldev-network:
+  web:
     external: true
