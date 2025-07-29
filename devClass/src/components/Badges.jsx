@@ -1,6 +1,7 @@
 import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast } from "@chakra-ui/react";
 import { useState } from "react";
-import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaRocket, FaStar, FaBolt, FaMedal, FaLock } from "react-icons/fa";
+import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaStar, FaBolt, FaLock } from "react-icons/fa";
+import PropTypes from 'prop-types';
 
 const AchievementCard = ({ achievement }) => {
   const { title, description, icon, level, color, current, total } = achievement;
@@ -26,6 +27,18 @@ const AchievementCard = ({ achievement }) => {
       </Flex>
     </Box>
   );
+};
+
+AchievementCard.propTypes = {
+  achievement: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    icon: PropTypes.element.isRequired,
+    level: PropTypes.number.isRequired,
+    color: PropTypes.string.isRequired,
+    current: PropTypes.number.isRequired,
+    total: PropTypes.number.isRequired
+  }).isRequired
 };
 
 const AchievementLocked = ({ achievement, onUnlock }) => {
@@ -57,6 +70,18 @@ const AchievementLocked = ({ achievement, onUnlock }) => {
       </Flex>
     </Box>
   );
+};
+
+AchievementLocked.propTypes = {
+  achievement: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    icon: PropTypes.element.isRequired,
+    level: PropTypes.number.isRequired,
+    color: PropTypes.string.isRequired,
+    unlockRequirement: PropTypes.string
+  }).isRequired,
+  onUnlock: PropTypes.func.isRequired
 };
 
 const AchievementsPage = () => {

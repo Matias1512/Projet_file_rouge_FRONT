@@ -1,5 +1,6 @@
 // src/AuthContext.js
 import { createContext, useContext, useEffect, useState } from "react";
+import PropTypes from 'prop-types';
 import axios from "axios";
 
 const AuthContext = createContext();
@@ -14,7 +15,7 @@ export const AuthProvider = ({ children }) => {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
         try {
-          const response = await axios.get('https://schooldev.duckdns.org/api/courses', {
+          await axios.get('https://schooldev.duckdns.org/api/courses', {
             headers: { Authorization: `Bearer ${storedToken}` }
           });
           setToken(storedToken);
@@ -63,6 +64,10 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export const useAuth = () => useContext(AuthContext);

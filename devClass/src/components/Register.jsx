@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, VStack, Heading, IconButton, Flex, useToast } from "@chakra-ui/react";
 import axios from "axios";
@@ -14,12 +14,16 @@ const Register = () => {
   const navigate = useNavigate();
   const toast = useToast(); // Pour afficher des messages de succès ou d'erreur
   const { isAuthenticated } = useAuth(); // Assurez-vous d'importer le contexte d'authentification
+  
+  const navigateToHome = useCallback(() => {
+    navigate("/");
+  }, [navigate]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigateToHome();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigateToHome]);
 
 
   const handleSubmit = async (e) => {

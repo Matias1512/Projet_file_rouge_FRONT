@@ -1,5 +1,5 @@
 import { useAuth } from "../AuthContext";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Box, Button, Input, VStack, Heading, Flex, useToast } from "@chakra-ui/react";
@@ -12,13 +12,17 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    
+    const navigateToHome = useCallback(() => {
+      navigate("/");
+    }, [navigate]);
     const toast = useToast(); // Pour afficher des messages de succès ou d'erreur
     
     useEffect(() => {
       if (isAuthenticated) {
-        navigate("/");
+        navigateToHome();
       }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, navigateToHome]);
     
     const handleLogin = async (e) => {
       e.preventDefault();

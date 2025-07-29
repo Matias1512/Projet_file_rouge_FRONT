@@ -1,6 +1,7 @@
 // src/PrivateRoute.jsx
 import { useAuth } from "./AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
+import PropTypes from 'prop-types';
 
 /**
  * Ce composant protège l'accès à une route.
@@ -17,6 +18,10 @@ const PrivateRoute = ({ children }) => {
   }
 
   return children;
+};
+
+PrivateRoute.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export default PrivateRoute;
