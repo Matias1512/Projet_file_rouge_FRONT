@@ -37,7 +37,7 @@ const Register = () => {
       "role": "user" // Envoi du mot de passe sous "passwordHash"
     };
     axios.post("https://schooldev.duckdns.org/api/auth/register", userData)
-      .then(response => {
+      .then(() => {
         toast({
           title: "Inscription réussie !",
           description: "Tu peux maintenant te connecter.",
