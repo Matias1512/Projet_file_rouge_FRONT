@@ -10,22 +10,32 @@ COPY package*.json ./
 RUN npm ci
 
 # Copy source code
-COPY . .
+COPY src/ ./src/
+COPY public/ ./public/
+COPY index.html ./
+COPY vite.config.js ./
 
 # Build the application
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+  FROM nginx:alpine
 
-# Copy built application from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+  # Create non-root user
+  RUN addgroup -S nonroot \
+      && adduser -S nonroot -G nonroot
 
-# Copy custom nginx configuration if needed
-# COPY nginx.conf /etc/nginx/nginx.conf
+  # Copy built application from build stage
+  COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80
-EXPOSE 80
+  # Change ownership to non-root user
+  RUN chown -R nonroot:nonroot /usr/share/nginx/html
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+  # Switch to non-root user
+  USER nonroot
+
+  # Expose port 80
+  EXPOSE 80
+
+  # Start nginx
+  CMD ["nginx", "-g", "daemon off;"]
