@@ -1,4 +1,4 @@
-import { useAuth } from "../AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -81,7 +81,7 @@ function Login() {
               _hover={{ bg: "#2da8dd" }}
               onClick={() => navigate("/register")} // Redirection vers la page d'inscription
             >
-              S'inscrire
+              S&apos;inscrire
             </Button>
           </Flex>
     

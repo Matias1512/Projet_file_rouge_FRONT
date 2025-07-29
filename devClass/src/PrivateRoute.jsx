@@ -1,5 +1,5 @@
 // src/PrivateRoute.jsx
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./hooks/useAuth";
 import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from 'prop-types';
 

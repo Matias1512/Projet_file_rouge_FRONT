@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, VStack, Heading, IconButton, Flex, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import { useAuth } from "../AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const Register = () => {
   const [name, setName] = useState("");

@@ -1,6 +1,7 @@
-import { Box, VStack, Link, IconButton, Text, Flex, useColorModeValue, Button, useColorMode, Icon } from "@chakra-ui/react";
-import { FaHome, FaClock, FaDumbbell, FaTrophy, FaGift, FaShoppingBag, FaUser, FaPlus, FaSun, FaMoon, FaSignOutAlt } from "react-icons/fa";
-import { useAuth } from "../AuthContext";
+import { Box, VStack, Link, Text, Flex, useColorModeValue, Button, useColorMode, Icon } from "@chakra-ui/react";
+import { FaHome, FaClock, FaTrophy, FaUser, FaSun, FaMoon, FaSignOutAlt } from "react-icons/fa";
+import PropTypes from 'prop-types';
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const NavItem = ({ href, icon, label, active, color, onClick }) => (
@@ -28,6 +29,15 @@ const NavItem = ({ href, icon, label, active, color, onClick }) => (
         <Text>{label}</Text>
     </Flex>
 );
+
+NavItem.propTypes = {
+  href: PropTypes.string,
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  active: PropTypes.bool,
+  color: PropTypes.string.isRequired,
+  onClick: PropTypes.func
+};
 
 const NavBar = () => {
   const textColor = useColorModeValue("dark", "light");
@@ -73,6 +83,10 @@ const LayoutNavBar = ({ children }) => {
       <Box flex={1}>{children}</Box>
     </Flex>
   );
+};
+
+LayoutNavBar.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export { NavBar, LayoutNavBar };
