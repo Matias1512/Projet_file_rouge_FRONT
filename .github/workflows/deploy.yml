@@ -141,8 +141,10 @@ jobs:
             echo "Cloning repository for first time..."
             cd /home/azureuser/
             git clone https://github.com/${{ github.repository }}.git Projet_file_rouge_FRONT
-            docker network create schooldev-network || true
           fi
+          
+          # Create web network if not exists (shared with backend)
+          docker network create web || true
           
           # Deploy application
           cd /home/azureuser/Projet_file_rouge_FRONT
