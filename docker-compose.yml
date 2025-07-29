@@ -18,4 +18,5 @@ services:
 
 networks:
   web:
+    name: schooldev_web
     external: true
