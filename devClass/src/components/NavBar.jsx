@@ -1,10 +1,12 @@
 import { Box, VStack, Link, IconButton, Text, Flex, useColorModeValue, Button, useColorMode, Icon } from "@chakra-ui/react";
-import { FaHome, FaClock, FaDumbbell, FaTrophy, FaGift, FaShoppingBag, FaUser, FaPlus, FaSun, FaMoon } from "react-icons/fa";
+import { FaHome, FaClock, FaDumbbell, FaTrophy, FaGift, FaShoppingBag, FaUser, FaPlus, FaSun, FaMoon, FaSignOutAlt } from "react-icons/fa";
+import { useAuth } from "../AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const NavItem = ({ href, icon, label, active, color, onClick }) => (
     <Flex
-        as={href ? Link : Button}
-        href={href}
+        as={href && !onClick ? Link : Button}
+        href={href && !onClick ? href : undefined}
         onClick={onClick}
         display="flex"
         alignItems="center"
@@ -20,6 +22,7 @@ const NavItem = ({ href, icon, label, active, color, onClick }) => (
         _hover={{ bg: "gray.100", color: "gray.700" }}
         width="100%"
         justifyContent="flex-start"
+        variant="ghost"
     >
         <Icon as={icon} boxSize={5} color={color} />
         <Text>{label}</Text>
@@ -28,8 +31,14 @@ const NavItem = ({ href, icon, label, active, color, onClick }) => (
 
 const NavBar = () => {
   const textColor = useColorModeValue("dark", "light");
+  const { colorMode, toggleColorMode } = useColorMode();
+  const { logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
-  const { colorMode, toggleColorMode } = useColorMode()
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <Box as="nav" w="250px" minH="100vh" p={4} boxShadow="md" bg={useColorModeValue("gray.100", "gray.800")} color={textColor} borderRight="2px solid" borderRightColor="red.500">
@@ -44,6 +53,14 @@ const NavBar = () => {
           label={colorMode === "light" ? "MODE SOMBRE" : "MODE LUMIERE"} 
           color={textColor}
         />
+        {isAuthenticated && (
+          <NavItem 
+            onClick={handleLogout} 
+            icon={FaSignOutAlt} 
+            label="DECONNEXION" 
+            color={textColor}
+          />
+        )}
       </VStack>
     </Box>
   );

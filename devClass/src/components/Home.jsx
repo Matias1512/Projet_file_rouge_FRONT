@@ -7,10 +7,12 @@ import axios from "axios";
 
 export default function Home() {
   const [courses, setCourses] = useState([]);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (isLoading) return;
+    
     if (!isAuthenticated) {
       navigate('/login');
       return;
@@ -30,7 +32,7 @@ export default function Home() {
     };
 
     fetchCourses();
-  }, [isAuthenticated, logout, navigate]);
+  }, [isAuthenticated, logout, navigate, isLoading]);
 
   const bgPage = useColorModeValue("white", "gray.800");
 

@@ -6,6 +6,28 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Vérifier la validité du token au démarrage
+    const validateToken = async () => {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        try {
+          const response = await axios.get('https://schooldev.duckdns.org/api/courses', {
+            headers: { Authorization: `Bearer ${storedToken}` }
+          });
+          setToken(storedToken);
+        } catch (error) {
+          localStorage.removeItem("token");
+          setToken(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    validateToken();
+  }, []);
 
   useEffect(() => {
     // Intercepteur axios pour attacher le token automatiquement
@@ -37,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!token;
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ token, login, logout, isAuthenticated, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
