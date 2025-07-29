@@ -149,6 +149,8 @@ jobs:
           git fetch
           git checkout main
           git pull origin main
+          
+          # Pull and start new container
           docker-compose pull frontend
           docker-compose up -d frontend
         

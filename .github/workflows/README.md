@@ -50,9 +50,9 @@ feature/xxx → main → VM Azure
 ## Environnement
 
 ### Production (VM Azure)
-- **URL**: https://schooldev.duckdns.org
+- **URL**: https://schooldev.duckdns.org:3000
 - **Container**: `schooldev_front`
-- **Port**: 80
+- **Port**: 3000 (externe) → 80 (interne)
 - **Déploiement**: Automatique sur `main`
 - **Rollback**: Manuel avec tags Docker
 
