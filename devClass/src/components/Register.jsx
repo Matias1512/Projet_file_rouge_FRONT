@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Input, VStack, Heading, IconButton, Flex, useToast } from "@chakra-ui/react";
+import { Box, Button, Input, VStack, Heading, IconButton, Flex, useToast, Checkbox, Text } from "@chakra-ui/react";
 import axios from "axios";
 import { useAuth } from "../hooks/useAuth";
 
@@ -8,7 +9,9 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const [loading, setLoading] = useState(false); // Ajout d'un état pour gérer le chargement
   const navigate = useNavigate();
@@ -28,6 +31,19 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation des mots de passe
+    if (password !== confirmPassword) {
+      setPasswordError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    
+    if (password.length < 6) {
+      setPasswordError("Le mot de passe doit contenir au moins 6 caractères.");
+      return;
+    }
+    
+    setPasswordError("");
     setLoading(true); // Met l'état de chargement à vrai
     console.log("Nom:", name, "Email:", email, "Password:", password);
     const userData = {
@@ -138,8 +154,54 @@ const Register = () => {
               color="#39b4e9"
               _hover={{ bg: "transparent" }}
               onClick={() => setShowPassword(!showPassword)}
+              icon={showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
             />
           </Box>
+
+          <Box position="relative" w="full">
+            <Input
+              type={showPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirmer le mot de passe"
+              bg="#1e2730"
+              color="white"
+              _placeholder={{ color: "gray.400" }}
+              _focus={{ borderColor: "#39b4e9", boxShadow: "0 0 0 1px #39b4e9" }}
+              size="lg"
+              pr="3rem"
+              required
+            />
+            <IconButton
+              position="absolute"
+              top="50%"
+              right="4"
+              transform="translateY(-50%)"
+              bg="transparent"
+              color="#39b4e9"
+              _hover={{ bg: "transparent" }}
+              onClick={() => setShowPassword(!showPassword)}
+              icon={showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+            />
+          </Box>
+
+          <Checkbox
+            isChecked={showPassword}
+            onChange={(e) => setShowPassword(e.target.checked)}
+            colorScheme="blue"
+            color="white"
+            alignSelf="flex-start"
+          >
+            Afficher les mots de passe
+          </Checkbox>
+
+          {passwordError && (
+            <Text color="red.400" fontSize="sm" alignSelf="flex-start">
+              {passwordError}
+            </Text>
+          )}
 
           <Button
             type="submit"
