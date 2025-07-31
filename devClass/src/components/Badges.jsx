@@ -102,19 +102,21 @@ const AchievementsPage = () => {
   };
 
   return (
-    <Container maxW="3xl" py={8}>
-      <Heading size="xl" mb={6}>Mes succès</Heading>
-      <VStack spacing={4} align="stretch">
-        <Heading size="md">Succès débloqués</Heading>
-        {achievements.filter(a => a.unlocked).map(a => <AchievementCard key={a.id} achievement={a} />)}
-      </VStack>
-      <VStack spacing={4} align="stretch" mt={8}>
-        <Heading size="md">Succès à débloquer</Heading>
-        {achievements.filter(a => !a.unlocked).map(a => (
-          <AchievementLocked key={a.id} achievement={a} onUnlock={() => unlockAchievement(a.id)} />
-        ))}
-      </VStack>
-    </Container>
+    <Box h="100vh" overflowY="auto">
+      <Container maxW="3xl" py={8} pb={10}>
+        <Heading size="xl" mb={6}>Mes succès</Heading>
+        <VStack spacing={4} align="stretch">
+          <Heading size="md">Succès débloqués</Heading>
+          {achievements.filter(a => a.unlocked).map(a => <AchievementCard key={a.id} achievement={a} />)}
+        </VStack>
+        <VStack spacing={4} align="stretch" mt={8}>
+          <Heading size="md">Succès à débloquer</Heading>
+          {achievements.filter(a => !a.unlocked).map(a => (
+            <AchievementLocked key={a.id} achievement={a} onUnlock={() => unlockAchievement(a.id)} />
+          ))}
+        </VStack>
+      </Container>
+    </Box>
   );
 };
 
