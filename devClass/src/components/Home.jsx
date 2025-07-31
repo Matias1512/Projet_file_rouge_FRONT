@@ -10,6 +10,7 @@ export default function Home() {
   const [courses, setCourses] = useState([]);
   const { isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
+  const progressPercentage = 0;
 
   useEffect(() => {
     if (isLoading) return;
@@ -61,9 +62,9 @@ export default function Home() {
           },
         }}
       >
-        {courses.map((course) => (
+        {courses.map((course, index) => (
           <Box key={course.courseId} minW="20vw" h="100%" flexShrink={0}>
-            <CoursesCard course={course} />
+            <CoursesCard course={course} isLocked={index > 0 && progressPercentage === 0} />
           </Box>
         ))}
       </Flex>
@@ -71,7 +72,7 @@ export default function Home() {
   )
 }
 
-function CoursesCard({ course }) {
+function CoursesCard({ course, isLocked }) {
   const navigate = useNavigate()
 
   const cardBg = useColorModeValue("white", "gray.900");
@@ -105,6 +106,7 @@ function CoursesCard({ course }) {
         bg={cardBg}
         border="2px solid"
         borderColor={languageColor}
+        opacity={isLocked ? 0.5 : 1}
       />
       
       <Flex
@@ -116,6 +118,8 @@ function CoursesCard({ course }) {
         h="100%"
         w="100%"
         gap={6}
+        opacity={isLocked ? 0.4 : 1}
+        filter={isLocked ? "grayscale(100%)" : "none"}
       >
         <img
           src="/images/mascotte.png"
@@ -135,14 +139,29 @@ function CoursesCard({ course }) {
           </Text>
         </Flex>
 
+        {isLocked && (
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            zIndex={3}
+            fontSize="6xl"
+            opacity={0.3}
+          >
+            🔒
+          </Box>
+        )}
+
         <Button 
-          colorScheme="red" 
+          colorScheme={isLocked ? "gray" : "red"} 
           size="md" 
           fontWeight="bold" 
           px={8}
-          onClick={() => navigate("/lessons")}
+          onClick={() => !isLocked && navigate("/lessons")}
+          disabled={isLocked}
         >
-          CONTINUER
+          {isLocked ? "VERROUILLÉ" : "CONTINUER"}
         </Button>
       </Flex>
     </Box>
@@ -154,5 +173,6 @@ CoursesCard.propTypes = {
     courseId: PropTypes.number.isRequired,
     language: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  isLocked: PropTypes.bool.isRequired
 };
