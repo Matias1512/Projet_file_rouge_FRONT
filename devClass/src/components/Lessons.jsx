@@ -1,67 +1,106 @@
 import { Box, VStack, Text, Icon, Flex, Button } from "@chakra-ui/react";
-import { FaDumbbell, FaBook, FaStar } from "react-icons/fa";
-import { useState } from "react";
-
-const pathExercice = [
-  { id: 1, idLesson: 1, title: "Titre1", icon: FaStar, description: "COMMENCER", locked: false },
-  { id: 2, idLesson: 1, title: "Titre2", icon: FaBook, description: "Lire un article", locked: true },
-  { id: 3, idLesson: 1, title: "Titre3", icon: FaBook, description: "Apprendre une leçon", locked: true },
-  { id: 4, idLesson: 1, title: "Titre4", icon: FaStar, description: "Atteindre un objectif", locked: true },
-  { id: 5, idLesson: 2, title: "Titre5", icon: FaDumbbell, description: "S'entraîner avec des exercices", locked: true },
-  { id: 6, idLesson: 2, title: "Titre6", icon: FaBook, description: "Étudier un concept", locked: true },
-  { id: 7, idLesson: 2, title: "Titre7", icon: FaStar, description: "Gagner des points", locked: true },
-  { id: 8, idLesson: 1, title: "Titre8", icon: FaStar, description: "Débloquer un nouveau niveau", locked: true }
-];
+import { FaBook } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Lessons = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
-  const lessonColor = "blue.400"; // couleur de la leçon statique
+  const [lessons, setLessons] = useState([]);
+  const [setCurrentLesson] = useState(null);
+  const { isAuthenticated, logout, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const getLessonColor = (language) => {
+    if (language?.toLowerCase() === 'java') {
+      return "red.400";
+    }
+    return "blue.400";
+  };
 
-  const exercises = pathExercice.filter(ex => ex.idLesson === 1); // tu peux changer l'ID ici si nécessaire
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchLessons = async () => {
+      try {
+        const response = await axios.get('https://schooldev.duckdns.org/api/lessons');
+        setLessons(response.data);
+        if (response.data.length > 0) {
+          setCurrentLesson(response.data[0]);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des leçons:', error);
+        if (error.response?.status === 403 || error.response?.status === 401) {
+          logout();
+          navigate('/login');
+        }
+      }
+    };
+
+    fetchLessons();
+  }, [isAuthenticated, logout, navigate, isLoading]);
+
+  if (lessons.length === 0) {
+    return (
+      <Box minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <Text>Chargement des leçons...</Text>
+      </Box>
+    );
+  }
 
   return (
-    <Box minH="100vh" p={6} display="flex" flexDirection="column" alignItems="center" >
-      <Box w="full" mb={10}>
-        <Box w="lg" bg={lessonColor} p={4} borderRadius="lg" margin="auto" textAlign="center" color={"white"}>
-          <Text fontSize="lg" fontWeight="bold">JAVA</Text>
-          <Text fontSize="xl">Lesson1</Text>
-        </Box>
-        <VStack spacing={6} mt={6} align="center">
-          {exercises.map((item) => (
-            <Flex key={item.id} align="center" direction="row" position="relative">
-              {hoveredItem === item.id && (
-                <Box
-                  position="absolute"
-                  right="-170px"
-                  bg={lessonColor}
-                  color={"white"}
-                  p={2}
-                  borderRadius="md"
-                  width="150px"
-                  textAlign="center"
-                  zIndex="1"
-                >
-                  {item.description}
-                </Box>
-              )}
-              <Button
-                onMouseEnter={() => setHoveredItem(item.id)}
-                onMouseLeave={() => setHoveredItem(null)}
-                onClick={() => console.log("Clicked", item.title)}
-                isDisabled={item.locked}
-                borderRadius="full"
-                w={12}
-                h={12}
-                bg={item.locked ? "gray.300" : "blue.400"}
-                _hover={{ bg: item.locked ? "gray.300" : "blue.500" }}
-                p={0}
-              >
-                <Icon as={item.icon} color={item.locked ? "gray.500" : "white"} w={6} h={6} />
-              </Button>
-            </Flex>
-          ))}
-        </VStack>
-      </Box>
+    <Box h="100vh" p={6} display="flex" flexDirection="column" alignItems="center" overflowY="auto">
+      <VStack spacing={10} w="full" align="center" pb={10}>
+        {lessons.map((lesson, lessonIndex) => {
+          const lessonColor = getLessonColor(lesson.course?.language);
+          return (
+            <Box key={lesson.lessonId} w="full" mb={10}>
+              <Box w="lg" bg={lessonColor} p={4} borderRadius="lg" margin="auto" textAlign="center" color={"white"}>
+                <Text fontSize="lg" fontWeight="bold">Lesson {lesson.orderInCourse || lessonIndex + 1}</Text>
+                <Text fontSize="xl">{lesson.title || `Leçon ${lessonIndex + 1}`}</Text>
+              </Box>
+              <VStack spacing={6} mt={6} align="center">
+                <Flex align="center" direction="row" position="relative">
+                  {hoveredItem === lesson.lessonId && (
+                    <Box
+                      position="absolute"
+                      right="-170px"
+                      bg={lessonColor}
+                      color={"white"}
+                      p={2}
+                      borderRadius="md"
+                      width="150px"
+                      textAlign="center"
+                      zIndex="1"
+                    >
+                      {lesson.title}
+                    </Box>
+                  )}
+                  <Button
+                    onMouseEnter={() => setHoveredItem(lesson.lessonId)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => console.log("Clicked", lesson.title)}
+                    isDisabled={lessonIndex > 0}
+                    borderRadius="full"
+                    w={12}
+                    h={12}
+                    bg={lessonIndex > 0 ? "gray.300" : lessonColor}
+                    _hover={{ bg: lessonIndex > 0 ? "gray.300" : lessonColor.replace('400', '500') }}
+                    p={0}
+                  >
+                    <Icon as={FaBook} color={lessonIndex > 0 ? "gray.500" : "white"} w={6} h={6} />
+                  </Button>
+                </Flex>
+              </VStack>
+            </Box>
+          );
+        })}
+      </VStack>
     </Box>
   );
 };

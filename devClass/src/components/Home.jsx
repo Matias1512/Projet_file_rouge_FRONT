@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, Progress, Text, useColorModeValue } from "@chakra-ui/react"
+import { Box, Button, Flex, Heading, Progress, Text, useColorModeValue, Badge } from "@chakra-ui/react"
 import PropTypes from 'prop-types';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
@@ -86,6 +86,24 @@ function CoursesCard({ course, isLocked }) {
   
   const languageColor = languageColors[course.language?.toUpperCase()] || '#666';
   const progressPercentage = 0;
+  
+  const getDifficultyColor = (level) => {
+    switch(level?.toUpperCase()) {
+      case 'EASY': return 'green';
+      case 'MEDIUM': return 'orange';
+      case 'HARD': return 'red';
+      default: return 'blue';
+    }
+  };
+
+  const getDifficultyLabel = (level) => {
+    switch(level?.toUpperCase()) {
+      case 'EASY': return 'FACILE';
+      case 'MEDIUM': return 'MOYEN';
+      case 'HARD': return 'DIFFICILE';
+      default: return 'DÉBUTANT';
+    }
+  };
 
   return (
     <Box 
@@ -128,9 +146,14 @@ function CoursesCard({ course, isLocked }) {
           height="350"
         />
 
-        <Heading as="h2" size="lg" color={cardText} textAlign="center" fontWeight="bold">
-          {course.title}
-        </Heading>
+        <Flex direction="column" align="center" gap={2}>
+          <Badge colorScheme={getDifficultyColor(course.difficultyLevel)} fontSize="sm" px={3} py={1}>
+            {getDifficultyLabel(course.difficultyLevel)}
+          </Badge>
+          <Heading as="h2" size="lg" color={cardText} textAlign="center" fontWeight="bold">
+            {course.title}
+          </Heading>
+        </Flex>
 
         <Flex align="center" gap={3} w="300px">
           <Progress value={progressPercentage} size="md" colorScheme="green" bg="white" flex="1" />
@@ -172,7 +195,8 @@ CoursesCard.propTypes = {
   course: PropTypes.shape({
     courseId: PropTypes.number.isRequired,
     language: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired,
+    difficultyLevel: PropTypes.string
   }).isRequired,
   isLocked: PropTypes.bool.isRequired
 };
