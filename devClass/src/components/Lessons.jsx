@@ -1,14 +1,25 @@
-import { Box, VStack, Text, Icon, Flex, Button } from "@chakra-ui/react";
-import { FaBook } from "react-icons/fa";
+import { Box, VStack, Text, Icon, Flex, Button, Spinner } from "@chakra-ui/react";
+import { FaBook, FaDumbbell, FaStar } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const getIconForType = (type) => {
+  switch(type?.toLowerCase()) {
+    case 'exercise': return FaDumbbell;
+    case 'reading': return FaBook;
+    case 'challenge': return FaStar;
+    case 'qcm': return FaStar;
+    default: return FaStar;
+  }
+};
+
 const Lessons = () => {
-  const [hoveredItem, setHoveredItem] = useState(null);
   const [lessons, setLessons] = useState([]);
-  const [setCurrentLesson] = useState(null);
+  const [exercisesByLesson, setExercisesByLesson] = useState({});
+  const [loadingExercises, setLoadingExercises] = useState({});
+  const [currentLesson, setCurrentLesson] = useState(null);
   const { isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const getLessonColor = (language) => {
@@ -33,6 +44,33 @@ const Lessons = () => {
         if (response.data.length > 0) {
           setCurrentLesson(response.data[0]);
         }
+        
+        // Récupérer les exercices pour chaque leçon
+        const exercisesPromises = response.data.map(async (lesson) => {
+          setLoadingExercises(prev => ({ ...prev, [lesson.lessonId]: true }));
+          try {
+            const exercisesResponse = await axios.get(`https://schooldev.duckdns.org/api/exercises/lesson/${lesson.lessonId}`);
+            return { lessonId: lesson.lessonId, exercises: exercisesResponse.data || [] };
+          } catch (error) {
+            // Ne pas considérer comme une erreur critique si une leçon n'a pas d'exercices
+            if (error.response?.status === 404) {
+              console.log(`Aucun exercice trouvé pour la leçon ${lesson.lessonId}`);
+            } else {
+              console.error(`Erreur lors de la récupération des exercices pour la leçon ${lesson.lessonId}:`, error);
+            }
+            return { lessonId: lesson.lessonId, exercises: [] };
+          } finally {
+            setLoadingExercises(prev => ({ ...prev, [lesson.lessonId]: false }));
+          }
+        });
+
+        const exercisesResults = await Promise.all(exercisesPromises);
+        const exercisesMap = {};
+        exercisesResults.forEach(result => {
+          exercisesMap[result.lessonId] = result.exercises;
+        });
+        setExercisesByLesson(exercisesMap);
+        
       } catch (error) {
         console.error('Erreur lors de la récupération des leçons:', error);
         if (error.response?.status === 403 || error.response?.status === 401) {
@@ -58,6 +96,9 @@ const Lessons = () => {
       <VStack spacing={10} w="full" align="center" pb={10}>
         {lessons.map((lesson, lessonIndex) => {
           const lessonColor = getLessonColor(lesson.course?.language);
+          const exercises = exercisesByLesson[lesson.lessonId];
+          const exercisesArray = Array.isArray(exercises) ? exercises : [];
+          
           return (
             <Box key={lesson.lessonId} w="full" mb={10}>
               <Box w="lg" bg={lessonColor} p={4} borderRadius="lg" margin="auto" textAlign="center" color={"white"}>
@@ -65,37 +106,52 @@ const Lessons = () => {
                 <Text fontSize="xl">{lesson.title || `Leçon ${lessonIndex + 1}`}</Text>
               </Box>
               <VStack spacing={6} mt={6} align="center">
-                <Flex align="center" direction="row" position="relative">
-                  {hoveredItem === lesson.lessonId && (
-                    <Box
-                      position="absolute"
-                      right="-170px"
-                      bg={lessonColor}
-                      color={"white"}
-                      p={2}
-                      borderRadius="md"
-                      width="150px"
-                      textAlign="center"
-                      zIndex="1"
-                    >
-                      {lesson.title}
-                    </Box>
-                  )}
-                  <Button
-                    onMouseEnter={() => setHoveredItem(lesson.lessonId)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                    onClick={() => console.log("Clicked", lesson.title)}
-                    isDisabled={lessonIndex > 0}
-                    borderRadius="full"
-                    w={12}
-                    h={12}
-                    bg={lessonIndex > 0 ? "gray.300" : lessonColor}
-                    _hover={{ bg: lessonIndex > 0 ? "gray.300" : lessonColor.replace('400', '500') }}
-                    p={0}
-                  >
-                    <Icon as={FaBook} color={lessonIndex > 0 ? "gray.500" : "white"} w={6} h={6} />
-                  </Button>
-                </Flex>
+                {loadingExercises[lesson.lessonId] ? (
+                  <Flex align="center" gap={2}>
+                    <Spinner size="sm" />
+                    <Text fontSize="sm" color="gray.500">Chargement des exercices...</Text>
+                  </Flex>
+                ) : exercisesArray.length === 0 ? (
+                  <Text fontSize="sm" color="gray.500" fontStyle="italic">Cette leçon ne contient pas d&apos;exercices interactifs</Text>
+                ) : (
+                  <VStack spacing={3} align="center">
+                    {exercisesArray.map((exercise, exerciseIndex) => (
+                      <Flex key={exercise.exerciseId} align="center" direction="row" gap={4}>
+                        <Button
+                          onClick={() => {
+                            console.log("Clicked exercise", exercise.title, "Type:", exercise.type, "ID:", exercise.exerciseId);
+                            if (exercise.type?.toLowerCase() === 'exercise') {
+                              navigate('/editor');
+                            } else if (exercise.type?.toLowerCase() === 'qcm') {
+                              navigate(`/exercise/${exercise.exerciseId}/qcm`);
+                            }
+                          }}
+                          isDisabled={lessonIndex > 0 || exerciseIndex > 0}
+                          borderRadius="full"
+                          w={12}
+                          h={12}
+                          bg={(lessonIndex > 0 || exerciseIndex > 0) ? "gray.300" : lessonColor}
+                          _hover={{ bg: (lessonIndex > 0 || exerciseIndex > 0) ? "gray.300" : lessonColor.replace('400', '500') }}
+                          p={0}
+                        >
+                          <Icon 
+                            as={getIconForType(exercise.type)} 
+                            color={(lessonIndex > 0 || exerciseIndex > 0) ? "gray.500" : "white"} 
+                            w={6} 
+                            h={6} 
+                          />
+                        </Button>
+                        <Text 
+                          fontSize="md" 
+                          fontWeight="medium"
+                          color={(lessonIndex > 0 || exerciseIndex > 0) ? "gray.500" : "inherit"}
+                        >
+                          {exercise.title}
+                        </Text>
+                      </Flex>
+                    ))}
+                  </VStack>
+                )}
               </VStack>
             </Box>
           );

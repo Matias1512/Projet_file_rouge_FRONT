@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Intercepteur axios pour attacher le token automatiquement
-    const interceptor = axios.interceptors.request.use(
+    const requestInterceptor = axios.interceptors.request.use(
       config => {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -42,8 +42,21 @@ export const AuthProvider = ({ children }) => {
       error => Promise.reject(error)
     );
 
+    // Intercepteur de réponse pour gérer les erreurs d'authentification
+    const responseInterceptor = axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem("token");
+          setToken(null);
+        }
+        return Promise.reject(error);
+      }
+    );
+
     return () => {
-      axios.interceptors.request.eject(interceptor);
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
     };
   }, [token]);
 

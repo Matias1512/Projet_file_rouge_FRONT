@@ -9,6 +9,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import Lessons from "./components/Lessons";
 import Home from "./components/Home";
 import AchievementsPage from "./components/Badges";
+import QCMExercise from "./components/QCMExercise";
 
 import { AuthProvider } from "./AuthContext"; // ✅ Ton contexte d'authentification
 import PrivateRoute from "./PrivateRoute"; // ✅ Pour protéger les routes privées
@@ -56,6 +57,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Lessons />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/exercise/:exerciseId/qcm"
+            element={
+              <PrivateRoute>
+                <QCMExercise />
               </PrivateRoute>
             }
           />
