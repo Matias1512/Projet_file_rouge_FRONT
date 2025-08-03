@@ -16,11 +16,12 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import axios from "axios";
+import { createUserExercise, getUserExercises, updateUserExercise } from "../api";
 
 const QCMExercise = () => {
   const { exerciseId } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, logout, isLoading } = useAuth();
+  const { isAuthenticated, logout, isLoading, user } = useAuth();
   const toast = useToast();
 
   const [exercise, setExercise] = useState(null);
@@ -28,6 +29,7 @@ const QCMExercise = () => {
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [userExercise, setUserExercise] = useState(null);
 
   useEffect(() => {
     if (isLoading) return;
@@ -57,6 +59,27 @@ const QCMExercise = () => {
 
         setExercise(exerciseData);
         
+        // Gérer le UserExercise (vérifier l'existence avant création)
+        const userId = user?.userId || user?.userid || user?.id || user?.user_id;
+        
+        if (user && userId && exerciseData.exerciseId) {
+          try {
+            const userExercisesResponse = await getUserExercises(userId);
+            const existingUserExercise = userExercisesResponse.find(ue => ue.exercise.exerciseId === exerciseData.exerciseId) || null;
+            
+            if (existingUserExercise) {
+              console.log("QCMExercise - UserExercise already exists:", existingUserExercise);
+              setUserExercise(existingUserExercise);
+            } else {
+              console.log("QCMExercise - Creating new UserExercise - userId:", userId, "exerciseId:", exerciseData.exerciseId);
+              const newUserExercise = await createUserExercise(userId, exerciseData.exerciseId, false);
+              setUserExercise(newUserExercise);
+            }
+          } catch (userExerciseError) {
+            console.warn('Erreur lors de la gestion du UserExercise:', userExerciseError);
+          }
+        }
+        
       } catch (error) {
         console.error('Erreur lors de la récupération de l\'exercice:', error);
         if (error.response?.status === 403 || error.response?.status === 401) {
@@ -78,7 +101,7 @@ const QCMExercise = () => {
     };
 
     fetchExercise();
-  }, [exerciseId, isAuthenticated, logout, navigate, isLoading, toast]);
+  }, [exerciseId, isAuthenticated, logout, navigate, isLoading, toast, user]);
 
   const handleAnswerSelect = (propositionId) => {
     setSelectedAnswer(propositionId.toString());
@@ -100,6 +123,16 @@ const QCMExercise = () => {
     try {
       const selectedProposition = exercise.propositions.find(p => p.propositionId.toString() === selectedAnswer);
       const isCorrect = selectedProposition?.correct || false;
+
+      // Mettre à jour le UserExercise avec le résultat
+      if (userExercise && isCorrect && userExercise.success === false) {
+        try {
+          await updateUserExercise(userExercise.id, true);
+          console.log('UserExercise mis à jour avec success=true');
+        } catch (updateError) {
+          console.warn('Erreur lors de la mise à jour du UserExercise:', updateError);
+        }
+      }
 
       setShowResults(true);
       

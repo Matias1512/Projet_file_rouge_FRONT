@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { createUserExercise, getUserExercises } from "../api";
 
 const getIconForType = (type) => {
   switch(type?.toLowerCase()) {
@@ -20,7 +21,8 @@ const Lessons = () => {
   const [exercisesByLesson, setExercisesByLesson] = useState({});
   const [loadingExercises, setLoadingExercises] = useState({});
   const [currentLesson, setCurrentLesson] = useState(null);
-  const { isAuthenticated, logout, isLoading } = useAuth();
+  const [userExercises, setUserExercises] = useState([]);
+  const { isAuthenticated, logout, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const getLessonColor = (language) => {
     if (language?.toLowerCase() === 'java') {
@@ -70,6 +72,17 @@ const Lessons = () => {
           exercisesMap[result.lessonId] = result.exercises;
         });
         setExercisesByLesson(exercisesMap);
+
+        // Récupérer les UserExercises de l'utilisateur
+        if (user && user.userId) {
+          try {
+            const userExercisesResponse = await getUserExercises(user.userId);
+            setUserExercises(userExercisesResponse);
+          } catch (userExerciseError) {
+            console.warn('Erreur lors de la récupération des UserExercises:', userExerciseError);
+            setUserExercises([]);
+          }
+        }
         
       } catch (error) {
         console.error('Erreur lors de la récupération des leçons:', error);
@@ -81,7 +94,38 @@ const Lessons = () => {
     };
 
     fetchLessons();
-  }, [isAuthenticated, logout, navigate, isLoading]);
+  }, [isAuthenticated, logout, navigate, isLoading, user]);
+
+  const handleExerciseStart = async (exercise) => {
+    if (user && user.userId && exercise.exerciseId) {
+      try {
+        let userExercisesResponse = await getUserExercises(user.userId);
+        const existingUserExercise = userExercisesResponse.find(ue => ue.exercise.exerciseId === exercise.exerciseId);
+        
+        if (!existingUserExercise) {
+          console.log("Lessons - Creating new UserExercise - userId:", user.userId, "exerciseId:", exercise.exerciseId);
+          await createUserExercise(user.userId, exercise.exerciseId, false);
+          
+          // Rafraîchir la liste des UserExercises
+          userExercisesResponse = await getUserExercises(user.userId);
+          setUserExercises(userExercisesResponse);
+        } else {
+          console.log("Lessons - UserExercise already exists for exercise:", exercise.exerciseId);
+        }
+      } catch (userExerciseError) {
+        // Ne pas bloquer l'utilisateur si la création échoue
+        console.warn('Erreur lors de la gestion du UserExercise:', userExerciseError);
+      }
+    }
+
+    // Naviguer vers l'exercice
+    console.log("Clicked exercise", exercise.title, "Type:", exercise.type, "ID:", exercise.exerciseId);
+    if (exercise.type?.toLowerCase() === 'exercise') {
+      navigate('/editor');
+    } else if (exercise.type?.toLowerCase() === 'qcm') {
+      navigate(`/exercise/${exercise.exerciseId}/qcm`);
+    }
+  };
 
   if (lessons.length === 0) {
     return (
@@ -118,14 +162,7 @@ const Lessons = () => {
                     {exercisesArray.map((exercise, exerciseIndex) => (
                       <Flex key={exercise.exerciseId} align="center" direction="row" gap={4}>
                         <Button
-                          onClick={() => {
-                            console.log("Clicked exercise", exercise.title, "Type:", exercise.type, "ID:", exercise.exerciseId);
-                            if (exercise.type?.toLowerCase() === 'exercise') {
-                              navigate('/editor');
-                            } else if (exercise.type?.toLowerCase() === 'qcm') {
-                              navigate(`/exercise/${exercise.exerciseId}/qcm`);
-                            }
-                          }}
+                          onClick={() => handleExerciseStart(exercise)}
                           isDisabled={lessonIndex > 0 || exerciseIndex > 0}
                           borderRadius="full"
                           w={12}

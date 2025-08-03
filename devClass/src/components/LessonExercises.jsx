@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { createUserExercise, getUserExercises } from "../api";
 
 const getIconForType = (type) => {
   switch(type) {
@@ -19,7 +20,8 @@ const LessonExercises = () => {
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isAuthenticated, logout, isLoading } = useAuth();
+  const [userExercises, setUserExercises] = useState([]);
+  const { isAuthenticated, logout, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const { lessonId } = useParams();
 
@@ -52,6 +54,17 @@ const LessonExercises = () => {
         const currentLesson = lessonResponse.data.find(l => l.lessonId === parseInt(lessonId));
         setLesson(currentLesson);
         
+        // Récupérer les UserExercises de l'utilisateur
+        if (user && user.userId) {
+          try {
+            const userExercisesResponse = await getUserExercises(user.userId);
+            setUserExercises(userExercisesResponse);
+          } catch (userExerciseError) {
+            console.warn('Erreur lors de la récupération des UserExercises:', userExerciseError);
+            setUserExercises([]);
+          }
+        }
+        
       } catch (error) {
         console.error('Erreur lors de la récupération des exercices:', error);
         setError('Impossible de charger les exercices de cette leçon');
@@ -68,6 +81,36 @@ const LessonExercises = () => {
       fetchExercises();
     }
   }, [lessonId, isAuthenticated, logout, navigate, isLoading]);
+
+  const handleExerciseStart = async (exercise) => {
+    if (user && user.userId && exercise.exerciseId) {
+      try {
+        let userExercisesResponse = await getUserExercises(user.userId);
+        const existingUserExercise = userExercisesResponse.find(ue => ue.exercise.exerciseId === exercise.exerciseId) || null;
+        
+        if (!existingUserExercise) {
+          console.log("LessonExercises - Creating new UserExercise - userId:", user.userId, "exerciseId:", exercise.exerciseId);
+          await createUserExercise(user.userId, exercise.exerciseId, false);
+          
+          // Rafraîchir la liste des UserExercises
+          userExercisesResponse = await getUserExercises(user.userId);
+          setUserExercises(userExercisesResponse);
+        } else {
+          console.log("LessonExercises - UserExercise already exists for exercise:", exercise.exerciseId);
+        }
+      } catch (userExerciseError) {
+        // Ne pas bloquer l'utilisateur si la création échoue
+        console.warn('Erreur lors de la gestion du UserExercise:', userExerciseError);
+      }
+    }
+
+    // Naviguer vers l'exercice
+    if (exercise.type?.toLowerCase() === 'qcm') {
+      navigate(`/exercise/${exercise.exerciseId}/qcm`);
+    } else {
+      navigate('/editor');
+    }
+  };
 
   if (loading) {
     return (
@@ -142,13 +185,7 @@ const LessonExercises = () => {
               {exercises.map((exercise, index) => (
                 <Flex key={exercise.id} align="center" direction="row" gap={4}>
                   <Button
-                    onClick={() => {
-                      if (exercise.type?.toLowerCase() === 'qcm') {
-                        navigate(`/exercise/${exercise.exerciseId}/qcm`);
-                      } else {
-                        navigate('/editor');
-                      }
-                    }}
+                    onClick={() => handleExerciseStart(exercise)}
                     isDisabled={index > 0}
                     borderRadius="full"
                     w={12}
