@@ -5,7 +5,7 @@ import {
   Radio, 
   RadioGroup, 
   Button, 
-  Progress, 
+  //Progress, 
   Alert, 
   AlertIcon, 
   Flex,
@@ -182,11 +182,13 @@ const QCMExercise = () => {
             w="full" 
             p={6} 
             bg="gray.50"
-            _dark={{ bg: "gray.700" }}
             borderRadius="lg" 
             border="1px solid" 
             borderColor={isCorrect ? "green.200" : "red.200"}
-            _dark={{ borderColor: isCorrect ? "green.600" : "red.600" }}
+            _dark={{ 
+              bg: "gray.700", 
+              borderColor: isCorrect ? "green.600" : "red.600" 
+            }}
           >
             <VStack spacing={4}>
               <Text 
@@ -210,10 +212,12 @@ const QCMExercise = () => {
                 p={4} 
                 borderRadius="md" 
                 bg={isCorrect ? "green.100" : "red.100"}
-                _dark={{ bg: isCorrect ? "green.700" : "red.700" }}
                 border="1px solid"
                 borderColor={isCorrect ? "green.300" : "red.300"}
-                _dark={{ borderColor: isCorrect ? "green.500" : "red.500" }}
+                _dark={{ 
+                  bg: isCorrect ? "green.700" : "red.700",
+                  borderColor: isCorrect ? "green.500" : "red.500"
+                }}
               >
                 <Text 
                   color={isCorrect ? "green.800" : "red.800"}
