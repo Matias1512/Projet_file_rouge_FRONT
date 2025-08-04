@@ -20,7 +20,6 @@ const Lessons = () => {
   const [lessons, setLessons] = useState([]);
   const [exercisesByLesson, setExercisesByLesson] = useState({});
   const [loadingExercises, setLoadingExercises] = useState({});
-  const [currentLesson, setCurrentLesson] = useState(null);
   const [userExercises, setUserExercises] = useState([]);
   const { isAuthenticated, logout, isLoading, user } = useAuth();
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ const Lessons = () => {
   };
 
   // Nouvelle logique de déverrouillage des exercices
-  const isExerciseUnlocked = (lessonIndex, exerciseIndex, exercise) => {
+  const isExerciseUnlocked = (lessonIndex, exerciseIndex) => {
     // Le premier exercice de la première leçon est toujours déverrouillé
     if (lessonIndex === 0 && exerciseIndex === 0) {
       return true;
@@ -95,9 +94,6 @@ const Lessons = () => {
       try {
         const response = await axios.get('https://schooldev.duckdns.org/api/lessons');
         setLessons(response.data);
-        if (response.data.length > 0) {
-          setCurrentLesson(response.data[0]);
-        }
         
         // Récupérer les exercices pour chaque leçon
         const exercisesPromises = response.data.map(async (lesson) => {
