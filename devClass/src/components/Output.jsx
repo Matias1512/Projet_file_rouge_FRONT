@@ -1,16 +1,20 @@
-import { Box, Button, Text, useToast, VStack, HStack, Badge, Divider} from "@chakra-ui/react";
+import { Box, Button, Text, useToast, VStack, HStack, Badge, Divider, Alert, AlertIcon, AlertTitle, AlertDescription} from "@chakra-ui/react";
 import { useState } from "react";
 import PropTypes from 'prop-types';
+import { useNavigate } from "react-router-dom";
 import { executeCode, getUserExercises, updateUserExercise } from "../api";
 import { useAuth } from "../hooks/useAuth";
+import { CODE_SNIPPETS } from "../constants";
 
 const Output = ({editorRef, language, exercise}) => {
     const toast = useToast();
     const { user } = useAuth();
+    const navigate = useNavigate();
   const [output, setOutput] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [testResults, setTestResults] = useState(null);
+  const [isExerciseCompleted, setIsExerciseCompleted] = useState(false);
 
     const runCode = async () => {
         // eslint-disable-next-line react/prop-types
@@ -40,6 +44,32 @@ const Output = ({editorRef, language, exercise}) => {
         }
     }
     
+    const handleRestart = () => {
+        // Remettre le code de départ ou le snippet par défaut
+        if (exercise && exercise.starterCode) {
+            editorRef.current.setValue(exercise.starterCode);
+        } else {
+            editorRef.current.setValue(CODE_SNIPPETS[language] || CODE_SNIPPETS.javascript);
+        }
+        
+        // Réinitialiser les états
+        setOutput(null);
+        setTestResults(null);
+        setIsExerciseCompleted(false);
+        setIsError(false);
+        
+        toast({
+            title: "Exercice réinitialisé",
+            description: "Vous pouvez recommencer l'exercice",
+            status: "info",
+            duration: 2000,
+        });
+    };
+    
+    const handleReturnToLessons = () => {
+        navigate('/lessons');
+    };
+    
     const checkTestCases = async (actualOutput, testCases) => {
         // Si testCases est un texte, on le traite comme un seul test case
         const expectedOutput = testCases.trim();
@@ -67,6 +97,7 @@ const Output = ({editorRef, language, exercise}) => {
                 
                 if (userExercise && !userExercise.success) {
                     await updateUserExercise(userExercise.id, true);
+                    setIsExerciseCompleted(true);
                     toast({
                         title: "🎉 Exercice réussi !",
                         description: "Tous les tests sont passés. L'exercice a été marqué comme réussi.",
@@ -74,6 +105,7 @@ const Output = ({editorRef, language, exercise}) => {
                         duration: 6000,
                     });
                 } else if (userExercise && userExercise.success) {
+                    setIsExerciseCompleted(true);
                     toast({
                         title: "Tous les tests réussis!",
                         description: "L'exercice était déjà marqué comme réussi.",
@@ -108,9 +140,30 @@ const Output = ({editorRef, language, exercise}) => {
             </Button>
             
             <VStack spacing={4} align="stretch">
+                {/* Message de félicitations */}
+                {isExerciseCompleted && (
+                    <Alert status="success" borderRadius="md">
+                        <AlertIcon />
+                        <Box>
+                            <AlertTitle>🎉 Bravo ! Exercice réussi !</AlertTitle>
+                            <AlertDescription>
+                                Félicitations ! Vous avez réussi cet exercice avec succès.
+                            </AlertDescription>
+                            <HStack spacing={3} mt={3}>
+                                <Button size="sm" colorScheme="blue" onClick={handleRestart}>
+                                    Recommencer
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={handleReturnToLessons}>
+                                    Retour aux leçons
+                                </Button>
+                            </HStack>
+                        </Box>
+                    </Alert>
+                )}
+                
                 {/* Zone d'output standard */}
                 <Box
-                    height={testResults ? '40vh' : '75vh'}
+                    height={testResults ? '40vh' : (isExerciseCompleted ? '50vh' : '75vh')}
                     p={2}
                     color={isError ? 'red.400' : ""}
                     border='1px solid'
@@ -167,7 +220,8 @@ Output.propTypes = {
     language: PropTypes.string.isRequired,
     exercise: PropTypes.shape({
         exerciseId: PropTypes.number,
-        testCases: PropTypes.string
+        testCases: PropTypes.string,
+        starterCode: PropTypes.string
     })
 };
 
