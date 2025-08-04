@@ -32,6 +32,33 @@ const LessonExercises = () => {
     return "blue.400";
   };
 
+  // Logique de déverrouillage des exercices pour une leçon spécifique
+  const isExerciseUnlocked = (exerciseIndex) => {
+    // Le premier exercice est toujours déverrouillé
+    if (exerciseIndex === 0) {
+      return true;
+    }
+
+    // Vérifier si l'exercice précédent est complété
+    const previousExercise = exercises[exerciseIndex - 1];
+    if (previousExercise) {
+      const previousUserExercise = userExercises.find(ue => 
+        ue.exercise.exerciseId === previousExercise.exerciseId
+      );
+      return previousUserExercise && previousUserExercise.success === true;
+    }
+
+    return false;
+  };
+
+  // Vérifier si un exercice est complété avec succès
+  const isExerciseCompleted = (exercise) => {
+    const userExercise = userExercises.find(ue => 
+      ue.exercise.exerciseId === exercise.exerciseId
+    );
+    return userExercise && userExercise.success === true;
+  };
+
   useEffect(() => {
     if (isLoading) return;
     
@@ -80,7 +107,7 @@ const LessonExercises = () => {
     if (lessonId) {
       fetchExercises();
     }
-  }, [lessonId, isAuthenticated, logout, navigate, isLoading]);
+  }, [lessonId, isAuthenticated, logout, navigate, isLoading, user]);
 
   const handleExerciseStart = async (exercise) => {
     if (user && user.userId && exercise.exerciseId) {
@@ -89,14 +116,11 @@ const LessonExercises = () => {
         const existingUserExercise = userExercisesResponse.find(ue => ue.exercise.exerciseId === exercise.exerciseId) || null;
         
         if (!existingUserExercise) {
-          console.log("LessonExercises - Creating new UserExercise - userId:", user.userId, "exerciseId:", exercise.exerciseId);
           await createUserExercise(user.userId, exercise.exerciseId, false);
           
           // Rafraîchir la liste des UserExercises
           userExercisesResponse = await getUserExercises(user.userId);
           setUserExercises(userExercisesResponse);
-        } else {
-          console.log("LessonExercises - UserExercise already exists for exercise:", exercise.exerciseId);
         }
       } catch (userExerciseError) {
         // Ne pas bloquer l'utilisateur si la création échoue
@@ -108,7 +132,7 @@ const LessonExercises = () => {
     if (exercise.type?.toLowerCase() === 'qcm') {
       navigate(`/exercise/${exercise.exerciseId}/qcm`);
     } else {
-      navigate('/editor');
+      navigate(`/editor?exerciseId=${exercise.exerciseId}`);
     }
   };
 
@@ -182,29 +206,42 @@ const LessonExercises = () => {
             </Box>
           ) : (
             <VStack spacing={6} mt={6} align="center">
-              {exercises.map((exercise, index) => (
-                <Flex key={exercise.id} align="center" direction="row" gap={4}>
-                  <Button
-                    onClick={() => handleExerciseStart(exercise)}
-                    isDisabled={index > 0}
-                    borderRadius="full"
-                    w={12}
-                    h={12}
-                    bg={index > 0 ? "gray.300" : lessonColor}
-                    _hover={{ bg: index > 0 ? "gray.300" : lessonColor.replace('400', '500') }}
-                    p={0}
-                  >
-                    <Icon as={getIconForType(exercise.type)} color={index > 0 ? "gray.500" : "white"} w={6} h={6} />
-                  </Button>
-                  <Text 
-                    fontSize="md" 
-                    fontWeight="medium"
-                    color={index > 0 ? "gray.500" : "inherit"}
-                  >
-                    {exercise.title || exercise.description}
-                  </Text>
-                </Flex>
-              ))}
+              {exercises.map((exercise, index) => {
+                const isUnlocked = isExerciseUnlocked(index, exercise);
+                const isCompleted = isExerciseCompleted(exercise);
+                
+                return (
+                  <Flex key={exercise.exerciseId || exercise.id} align="center" direction="row" gap={4}>
+                    <Button
+                      onClick={() => handleExerciseStart(exercise)}
+                      isDisabled={!isUnlocked}
+                      borderRadius="full"
+                      w={12}
+                      h={12}
+                      bg={isCompleted ? "green.400" : (isUnlocked ? lessonColor : "gray.300")}
+                      _hover={{ 
+                        bg: isCompleted ? "green.500" : (isUnlocked ? lessonColor.replace('400', '500') : "gray.300")
+                      }}
+                      p={0}
+                    >
+                      <Icon 
+                        as={getIconForType(exercise.type)} 
+                        color={isUnlocked ? "white" : "gray.500"} 
+                        w={6} 
+                        h={6} 
+                      />
+                    </Button>
+                    <Text 
+                      fontSize="md" 
+                      fontWeight="medium"
+                      color={isUnlocked ? "inherit" : "gray.500"}
+                    >
+                      {exercise.title || exercise.description}
+                      {isCompleted && " ✓"}
+                    </Text>
+                  </Flex>
+                );
+              })}
             </VStack>
           )}
         </Box>
