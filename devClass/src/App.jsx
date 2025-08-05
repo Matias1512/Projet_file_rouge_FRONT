@@ -10,6 +10,7 @@ import Lessons from "./components/Lessons";
 import Home from "./components/Home";
 import AchievementsPage from "./components/Badges";
 import QCMExercise from "./components/QCMExercise";
+import Profile from "./components/Profile";
 
 import { AuthProvider } from "./AuthContext"; // ✅ Ton contexte d'authentification
 import PrivateRoute from "./PrivateRoute"; // ✅ Pour protéger les routes privées
@@ -33,6 +34,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <AchievementsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             }
           />

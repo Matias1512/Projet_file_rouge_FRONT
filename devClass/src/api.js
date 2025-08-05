@@ -34,3 +34,8 @@ export const updateUserExercise = async (userExerciseId, success) => {
     const response = await axios.put(`https://schooldev.duckdns.org/api/user-exercises/${userExerciseId}/success?success=${success}`, {});
     return response.data;
 }
+
+export const getUserById = async (userId) => {
+    const response = await axios.get(`https://schooldev.duckdns.org/api/users/${userId}`);
+    return response.data;
+}

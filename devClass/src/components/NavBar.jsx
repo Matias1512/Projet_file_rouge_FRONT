@@ -55,7 +55,7 @@ const NavBar = () => {
       <VStack spacing={2} align="stretch">
         <NavItem href="/" icon={FaHome} label="MON COURS" active color={textColor} />
         <NavItem href="#" icon={FaClock} label="DEFIS" color={textColor} />
-        <NavItem href="#" icon={FaUser} label="PROFIL" color={textColor} />
+        <NavItem href="/profile" icon={FaUser} label="PROFIL" color={textColor} />
         <NavItem href="/achievements" icon={FaTrophy} label="BADGE" color={textColor} />
         <NavItem 
           onClick={toggleColorMode} 
