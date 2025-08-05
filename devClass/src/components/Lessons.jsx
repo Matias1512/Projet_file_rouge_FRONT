@@ -117,7 +117,8 @@ const Lessons = () => {
         const exercisesResults = await Promise.all(exercisesPromises);
         const exercisesMap = {};
         exercisesResults.forEach(result => {
-          exercisesMap[result.lessonId] = result.exercises;
+          // Trier les exercices par exerciseId pour garantir l'ordre
+          exercisesMap[result.lessonId] = result.exercises.sort((a, b) => a.exerciseId - b.exerciseId);
         });
         setExercisesByLesson(exercisesMap);
 
@@ -204,7 +205,7 @@ const Lessons = () => {
                 ) : (
                   <VStack spacing={3} align="center">
                     {exercisesArray.map((exercise, exerciseIndex) => {
-                      const isUnlocked = isExerciseUnlocked(lessonIndex, exerciseIndex, exercise);
+                      const isUnlocked = isExerciseUnlocked(lessonIndex, exerciseIndex);
                       const isCompleted = isExerciseCompleted(exercise);
                       
                       return (

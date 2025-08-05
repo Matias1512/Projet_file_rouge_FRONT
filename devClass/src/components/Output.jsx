@@ -17,7 +17,6 @@ const Output = ({editorRef, language, exercise}) => {
   const [isExerciseCompleted, setIsExerciseCompleted] = useState(false);
 
     const runCode = async () => {
-        // eslint-disable-next-line react/prop-types
         const sourceCode = editorRef.current.getValue();
         if(!sourceCode) return;
         try {
@@ -71,16 +70,182 @@ const Output = ({editorRef, language, exercise}) => {
     };
     
     const checkTestCases = async (actualOutput, testCases) => {
-        // Si testCases est un texte, on le traite comme un seul test case
-        const expectedOutput = testCases.trim();
-        const matches = actualOutput === expectedOutput;
+        let results = [];
         
-        const results = [{
-            index: 1,
-            expected: expectedOutput,
-            actual: actualOutput,
-            passed: matches
-        }];
+        // Validation spéciale pour l'exerciceId 7
+        if (exercise && exercise.exerciseId === 7) {
+            const sourceCode = editorRef.current.getValue();
+            
+            // Test 1: Vérifier que l'output contient les messages attendus
+            const expectedOutput = testCases.trim();
+            // Normaliser les sauts de ligne et supprimer les espaces en trop
+            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').replace(/\n+$/, '').trim();
+            const normalizedExpected = expectedOutput.replace(/\r\n/g, '\n').replace(/^ +/gm, '').trim();
+            const outputMatches = normalizedActual === normalizedExpected;
+            
+            // Test 2: Vérifier qu'il y a exactement deux instructions System.out.println
+            const printlnMatches = (sourceCode.match(/System\.out\.println/g) || []).length === 2;
+            
+            results = [
+                {
+                    index: 1,
+                    expected: normalizedExpected,
+                    actual: normalizedActual,
+                    passed: outputMatches,
+                    description: "Sortie attendue"
+                },
+                {
+                    index: 2,
+                    expected: "Deux instructions System.out.println",
+                    actual: `${(sourceCode.match(/System\.out\.println/g) || []).length} instruction(s) trouvée(s)`,
+                    passed: printlnMatches,
+                    description: "Nombre d'instructions d'affichage"
+                }
+            ];
+        } 
+        // Validation spéciale pour l'exerciceId 8
+        else if (exercise && exercise.exerciseId === 8) {
+            const sourceCode = editorRef.current.getValue();
+            
+            // Test 1: Vérifier que l'output contient la valeur attendue
+            const expectedOutput = testCases.trim();
+            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').replace(/\n+$/, '').trim();
+            const normalizedExpected = expectedOutput.replace(/\r\n/g, '\n').trim();
+            const outputMatches = normalizedActual === normalizedExpected;
+            
+            // Test 2: Vérifier qu'une variable int age = 25 est déclarée
+            const ageDeclarationRegex = /int\s+age\s*=\s*25\s*;/;
+            const hasAgeDeclaration = ageDeclarationRegex.test(sourceCode);
+            
+            // Test 3: Vérifier qu'il y a une instruction System.out.println avec age
+            const printAgeRegex = /System\.out\.println\s*\(\s*age\s*\)/;
+            const hasPrintAge = printAgeRegex.test(sourceCode);
+            
+            results = [
+                {
+                    index: 1,
+                    expected: normalizedExpected,
+                    actual: normalizedActual,
+                    passed: outputMatches,
+                    description: "Sortie attendue (25)"
+                },
+                {
+                    index: 2,
+                    expected: "Déclaration: int age = 25;",
+                    actual: hasAgeDeclaration ? "Variable age déclarée correctement" : "Variable age non trouvée ou incorrecte",
+                    passed: hasAgeDeclaration,
+                    description: "Déclaration de la variable age"
+                },
+                {
+                    index: 3,
+                    expected: "System.out.println(age);",
+                    actual: hasPrintAge ? "Instruction d'affichage trouvée" : "Instruction d'affichage de age non trouvée",
+                    passed: hasPrintAge,
+                    description: "Affichage de la variable age"
+                }
+            ];
+        }
+        // Validation spéciale pour l'exerciceId 9
+        else if (exercise && exercise.exerciseId === 9) {
+            const sourceCode = editorRef.current.getValue();
+            
+            // Test 1: Vérifier que l'output contient une valeur (le prénom)
+            const hasOutput = actualOutput.trim().length > 0;
+            
+            // Test 2: Vérifier qu'une variable String prenom est déclarée
+            const prenomDeclarationRegex = /String\s+prenom\s*=\s*"[^"]+"\s*;/;
+            const hasPrenomDeclaration = prenomDeclarationRegex.test(sourceCode);
+            
+            // Test 3: Vérifier qu'il y a une instruction System.out.println avec prenom
+            const printPrenomRegex = /System\.out\.println\s*\(\s*prenom\s*\)/;
+            const hasPrintPrenom = printPrenomRegex.test(sourceCode);
+            
+            // Extraire la valeur du prénom pour vérification
+            let expectedPrenom = "";
+            const prenomMatch = sourceCode.match(/String\s+prenom\s*=\s*"([^"]+)"\s*;/);
+            if (prenomMatch) {
+                expectedPrenom = prenomMatch[1];
+            }
+            
+            const outputMatchesPrenom = actualOutput.trim() === expectedPrenom;
+            
+            results = [
+                {
+                    index: 1,
+                    expected: expectedPrenom || "Une valeur de prénom",
+                    actual: actualOutput.trim(),
+                    passed: outputMatchesPrenom && hasOutput,
+                    description: "Sortie attendue (valeur de prenom)"
+                },
+                {
+                    index: 2,
+                    expected: "Déclaration: String prenom = \"...\";",
+                    actual: hasPrenomDeclaration ? "Variable prenom déclarée correctement" : "Variable prenom non trouvée ou incorrecte",
+                    passed: hasPrenomDeclaration,
+                    description: "Déclaration de la variable prenom"
+                },
+                {
+                    index: 3,
+                    expected: "System.out.println(prenom);",
+                    actual: hasPrintPrenom ? "Instruction d'affichage trouvée" : "Instruction d'affichage de prenom non trouvée",
+                    passed: hasPrintPrenom,
+                    description: "Affichage de la variable prenom"
+                }
+            ];
+        }
+        // Validation spéciale pour l'exerciceId 11
+        else if (exercise && exercise.exerciseId === 11) {
+            const sourceCode = editorRef.current.getValue();
+            
+            // Test 1: Vérifier que l'output contient la valeur attendue
+            const expectedOutput = testCases.trim();
+            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').replace(/\n+$/, '').trim();
+            const normalizedExpected = expectedOutput.replace(/\r\n/g, '\n').trim();
+            const outputMatches = normalizedActual === normalizedExpected;
+            
+            // Test 2: Vérifier qu'une variable double temperature = 23.5 est déclarée
+            const temperatureDeclarationRegex = /double\s+temperature\s*=\s*23\.5\s*;/;
+            const hasTemperatureDeclaration = temperatureDeclarationRegex.test(sourceCode);
+            
+            // Test 3: Vérifier qu'il y a une instruction System.out.println avec temperature
+            const printTemperatureRegex = /System\.out\.println\s*\(\s*temperature\s*\)/;
+            const hasPrintTemperature = printTemperatureRegex.test(sourceCode);
+            
+            results = [
+                {
+                    index: 1,
+                    expected: normalizedExpected,
+                    actual: normalizedActual,
+                    passed: outputMatches,
+                    description: "Sortie attendue (23.5)"
+                },
+                {
+                    index: 2,
+                    expected: "Déclaration: double temperature = 23.5;",
+                    actual: hasTemperatureDeclaration ? "Variable temperature déclarée correctement" : "Variable temperature non trouvée ou incorrecte",
+                    passed: hasTemperatureDeclaration,
+                    description: "Déclaration de la variable temperature"
+                },
+                {
+                    index: 3,
+                    expected: "System.out.println(temperature);",
+                    actual: hasPrintTemperature ? "Instruction d'affichage trouvée" : "Instruction d'affichage de temperature non trouvée",
+                    passed: hasPrintTemperature,
+                    description: "Affichage de la variable temperature"
+                }
+            ];
+        } else {
+            // Comportement par défaut pour les autres exercices
+            const expectedOutput = testCases.trim();
+            const matches = actualOutput === expectedOutput;
+            
+            results = [{
+                index: 1,
+                expected: expectedOutput,
+                actual: actualOutput,
+                passed: matches
+            }];
+        }
         
         setTestResults(results);
         
@@ -195,7 +360,9 @@ const Output = ({editorRef, language, exercise}) => {
                                     <Box key={result.index} p={2} border='1px solid' borderRadius={4}
                                          borderColor={result.passed ? 'green.500' : 'red.500'}>
                                         <HStack justify="space-between" mb={1}>
-                                            <Text fontSize='sm' fontWeight='bold'>Test {result.index}</Text>
+                                            <Text fontSize='sm' fontWeight='bold'>
+                                                Test {result.index}{result.description && `: ${result.description}`}
+                                            </Text>
                                             <Badge colorScheme={result.passed ? 'green' : 'red'}>
                                                 {result.passed ? 'RÉUSSI' : 'ÉCHOUÉ'}
                                             </Badge>
