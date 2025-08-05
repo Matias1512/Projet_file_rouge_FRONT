@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
 import { CODE_SNIPPETS } from "../constants";
 import Output from "./Output";
+import HintText from "./HintText";
 import axios from "axios";
 
 
@@ -110,7 +111,7 @@ const CodeEditor = () => {
                 <Box p={4} bg={exerciseBg} borderRadius="md" mb={4}>
                     <VStack align="start" spacing={2}>
                         <Text fontWeight="bold" color={exerciseTitleColor} fontSize="lg">{exercise.title}</Text>
-                        <Text color={exerciseDescColor} fontSize="sm">{exercise.description}</Text>
+                        <HintText text={exercise.description} color={exerciseDescColor} />
                         {exercise.lesson?.course?.language && (
                             <Box display="inline-block" px={2} py={1} bg={exerciseBadgeBg} borderRadius="md">
                                 <Text fontSize="xs" fontWeight="bold" color={exerciseTitleColor}>
