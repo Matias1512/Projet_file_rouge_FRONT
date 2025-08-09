@@ -3,12 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider } from '@chakra-ui/react'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 import CodeEditor from './CodeEditor'
 
 // Mock des modules
 vi.mock('axios')
-vi.mock('@monaco-editor/react', () => ({
-  Editor: ({ value, language, onChange, onMount }) => (
+vi.mock('@monaco-editor/react', () => {
+  const MockEditor = ({ value, language, onChange, onMount }) => (
     <div data-testid="monaco-editor">
       <div data-testid="editor-language">{language}</div>
       <textarea
@@ -19,7 +20,16 @@ vi.mock('@monaco-editor/react', () => ({
       />
     </div>
   )
-}))
+  
+  MockEditor.propTypes = {
+    value: PropTypes.string,
+    language: PropTypes.string,
+    onChange: PropTypes.func,
+    onMount: PropTypes.func
+  }
+  
+  return { Editor: MockEditor }
+})
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
@@ -106,6 +116,10 @@ const TestWrapper = ({ children }) => (
     </BrowserRouter>
   </ChakraProvider>
 )
+
+TestWrapper.propTypes = {
+  children: PropTypes.node.isRequired
+}
 
 describe('CodeEditor', () => {
   beforeEach(() => {
@@ -365,8 +379,6 @@ describe('CodeEditor', () => {
     })
 
     it('focus l\'éditeur au montage', async () => {
-      const focusSpy = vi.fn()
-      
       render(<CodeEditor />, { wrapper: TestWrapper })
       
       await waitFor(() => {

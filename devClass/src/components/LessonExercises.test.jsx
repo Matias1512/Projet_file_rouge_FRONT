@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider } from '@chakra-ui/react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import LessonExercises from './LessonExercises'
 import * as api from '../api'
@@ -81,6 +82,10 @@ const TestWrapper = ({ children }) => (
     </BrowserRouter>
   </ChakraProvider>
 )
+
+TestWrapper.propTypes = {
+  children: PropTypes.node.isRequired
+}
 
 describe('LessonExercises', () => {
   const mockNavigate = vi.fn()
@@ -321,9 +326,6 @@ describe('LessonExercises', () => {
     })
 
     it('démarre un exercice QCM', async () => {
-      // Test de la logique de navigation QCM uniquement
-      const originalHandleExerciseStart = LessonExercises.prototype?.handleExerciseStart
-      
       // Simuler un exercice QCM
       const qcmExercise = {
         exerciseId: 4,

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ChakraProvider } from '@chakra-ui/react'
+import PropTypes from 'prop-types'
 import LanguageSelector from './LanguageSelector'
 import { LANGUAGE_VERSIONS } from '../constants'
 
@@ -16,6 +17,10 @@ const TestWrapper = ({ children }) => (
     {children}
   </ChakraProvider>
 )
+
+TestWrapper.propTypes = {
+  children: PropTypes.node.isRequired
+}
 
 describe('LanguageSelector', () => {
   const mockOnSelect = vi.fn()

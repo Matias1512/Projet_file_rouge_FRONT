@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider } from '@chakra-ui/react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import Home from './Home'
 
@@ -55,6 +56,10 @@ const TestWrapper = ({ children }) => (
     </BrowserRouter>
   </ChakraProvider>
 )
+
+TestWrapper.propTypes = {
+  children: PropTypes.node.isRequired
+}
 
 describe('Home', () => {
   const mockNavigate = vi.fn()
