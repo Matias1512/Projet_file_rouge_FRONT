@@ -8,9 +8,9 @@ import axios from "axios";
 
 export default function Home() {
   const [courses, setCourses] = useState([]);
-  const { isAuthenticated, logout, isLoading } = useAuth();
+  const [coursesProgress, setCoursesProgress] = useState({});
+  const { isAuthenticated, logout, isLoading, user } = useAuth();
   const navigate = useNavigate();
-  const progressPercentage = 0;
 
   useEffect(() => {
     if (isLoading) return;
@@ -24,6 +24,9 @@ export default function Home() {
       try {
         const response = await axios.get('https://schooldev.duckdns.org/api/courses');
         setCourses(response.data);
+        
+        // Calculate progress for each course
+        await calculateCoursesProgress(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des cours:', error);
         if (error.response?.status === 403 || error.response?.status === 401) {
@@ -33,8 +36,42 @@ export default function Home() {
       }
     };
 
+    const calculateCoursesProgress = async (coursesList) => {
+      if (!user) {
+        return;
+      }
+      
+      // Try different possible user ID fields from JWT
+      const userId = user.id || user.userId || user.sub || user.user_id;
+      
+      if (!userId) {
+        return;
+      }
+
+      const progressData = {};
+      
+      for (const course of coursesList) {
+        try {
+          const progressResponse = await axios.get(`https://schooldev.duckdns.org/api/progress/user/${userId}/course/${course.courseId}/percentage`);
+          const progressPercentage = Math.round(progressResponse.data);
+          
+          progressData[course.courseId] = {
+            percentage: progressPercentage
+          };
+          
+        } catch (error) {
+          console.error(`Erreur lors de la récupération de la progression pour le cours ${course.courseId}:`, error);
+          progressData[course.courseId] = {
+            percentage: 0
+          };
+        }
+      }
+      
+      setCoursesProgress(progressData);
+    };
+
     fetchCourses();
-  }, [isAuthenticated, logout, navigate, isLoading]);
+  }, [isAuthenticated, logout, navigate, isLoading, user]);
 
   const bgPage = useColorModeValue("white", "gray.800");
 
@@ -62,17 +99,23 @@ export default function Home() {
           },
         }}
       >
-        {courses.map((course, index) => (
-          <Box key={course.courseId} minW="20vw" h="100%" flexShrink={0}>
-            <CoursesCard course={course} isLocked={index > 0 && progressPercentage === 0} />
-          </Box>
-        ))}
+        {courses.map((course, index) => {
+          const courseProgress = coursesProgress[course.courseId] || { percentage: 0 };
+          const previousCourseProgress = index > 0 ? coursesProgress[courses[index - 1].courseId] : null;
+          const isLocked = index > 0 && (!previousCourseProgress || previousCourseProgress.percentage < 100);
+          
+          return (
+            <Box key={course.courseId} minW="20vw" h="100%" flexShrink={0}>
+              <CoursesCard course={course} isLocked={isLocked} progress={courseProgress} />
+            </Box>
+          );
+        })}
       </Flex>
     </Box>
   )
 }
 
-function CoursesCard({ course, isLocked }) {
+function CoursesCard({ course, isLocked, progress }) {
   const navigate = useNavigate()
 
   const cardBg = useColorModeValue("white", "gray.900");
@@ -85,7 +128,6 @@ function CoursesCard({ course, isLocked }) {
   };
   
   const languageColor = languageColors[course.language?.toUpperCase()] || '#666';
-  const progressPercentage = 0;
   
   const getDifficultyColor = (level) => {
     switch(level?.toUpperCase()) {
@@ -156,9 +198,9 @@ function CoursesCard({ course, isLocked }) {
         </Flex>
 
         <Flex align="center" gap={3} w="300px">
-          <Progress value={progressPercentage} size="md" colorScheme="green" bg="white" flex="1" />
+          <Progress value={progress.percentage} size="md" colorScheme="green" bg="white" flex="1" />
           <Text color={cardText} fontSize="md" fontWeight="bold">
-            0/9
+            {progress.percentage}%
           </Text>
         </Flex>
 
@@ -198,5 +240,8 @@ CoursesCard.propTypes = {
     title: PropTypes.string.isRequired,
     difficultyLevel: PropTypes.string
   }).isRequired,
-  isLocked: PropTypes.bool.isRequired
+  isLocked: PropTypes.bool.isRequired,
+  progress: PropTypes.shape({
+    percentage: PropTypes.number.isRequired
+  }).isRequired
 };
