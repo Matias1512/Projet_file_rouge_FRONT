@@ -6,7 +6,7 @@ import { executeCode, getUserExercises, updateUserExercise } from "../api";
 import { useAuth } from "../hooks/useAuth";
 import { CODE_SNIPPETS } from "../constants";
 
-const Output = ({editorRef, language, exercise}) => {
+const Output = ({editorRef, language, exercise, onChallengeCompleted}) => {
     const toast = useToast();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -252,8 +252,32 @@ const Output = ({editorRef, language, exercise}) => {
         // Vérifier si tous les tests passent
         const allPassed = results.every(result => result.passed);
         
-        // Si tous les tests passent, marquer l'exercice comme réussi
-        if (allPassed && user && exercise) {
+        // Si c'est un défi, traitement spécial sans sauvegarde ni défaite
+        if (exercise && exercise.type === "challenge") {
+            if (allPassed) {
+                setIsExerciseCompleted(true);
+                // Stop the timer in the Challenge component
+                if (onChallengeCompleted) {
+                    onChallengeCompleted();
+                }
+                toast({
+                    title: "🏆 DÉFI RÉUSSI !",
+                    description: "Félicitations ! Vous avez relevé le défi avec succès !",
+                    status: "success",
+                    duration: 8000,
+                });
+            } else {
+                // Pour les défis, pas de message d'échec, juste l'état des tests
+                toast({
+                    title: "Continuez !",
+                    description: `${results.filter(r => r.passed).length}/${results.length} tests réussis - Vous pouvez y arriver !`,
+                    status: "info",
+                    duration: 4000,
+                });
+            }
+        }
+        // Si tous les tests passent, marquer l'exercice comme réussi (pour les exercices normaux)
+        else if (allPassed && user && exercise) {
             try {
                 const userExercises = await getUserExercises(user.userId);
                 const userExercise = userExercises.find(ue => 
@@ -310,18 +334,30 @@ const Output = ({editorRef, language, exercise}) => {
                     <Alert status="success" borderRadius="md">
                         <AlertIcon />
                         <Box>
-                            <AlertTitle>🎉 Bravo ! Exercice réussi !</AlertTitle>
-                            <AlertDescription>
-                                Félicitations ! Vous avez réussi cet exercice avec succès.
-                            </AlertDescription>
-                            <HStack spacing={3} mt={3}>
-                                <Button size="sm" colorScheme="blue" onClick={handleRestart}>
-                                    Recommencer
-                                </Button>
-                                <Button size="sm" variant="outline" onClick={handleReturnToLessons}>
-                                    Retour aux leçons
-                                </Button>
-                            </HStack>
+                            {exercise && exercise.type === "challenge" ? (
+                                <>
+                                    <AlertTitle>🏆 DÉFI RELEVÉ ! Bravo Champion !</AlertTitle>
+                                    <AlertDescription>
+                                        Félicitations ! Vous avez brillamment réussi ce défi de programmation ! 
+                                        Votre persévérance et vos compétences ont payé.
+                                    </AlertDescription>
+                                </>
+                            ) : (
+                                <>
+                                    <AlertTitle>🎉 Bravo ! Exercice réussi !</AlertTitle>
+                                    <AlertDescription>
+                                        Félicitations ! Vous avez réussi cet exercice avec succès.
+                                    </AlertDescription>
+                                    <HStack spacing={3} mt={3}>
+                                        <Button size="sm" colorScheme="blue" onClick={handleRestart}>
+                                            Recommencer
+                                        </Button>
+                                        <Button size="sm" variant="outline" onClick={handleReturnToLessons}>
+                                            Retour aux leçons
+                                        </Button>
+                                    </HStack>
+                                </>
+                            )}
                         </Box>
                     </Alert>
                 )}
@@ -388,8 +424,10 @@ Output.propTypes = {
     exercise: PropTypes.shape({
         exerciseId: PropTypes.number,
         testCases: PropTypes.string,
-        starterCode: PropTypes.string
-    })
+        starterCode: PropTypes.string,
+        type: PropTypes.string
+    }),
+    onChallengeCompleted: PropTypes.func
 };
 
 export default Output;

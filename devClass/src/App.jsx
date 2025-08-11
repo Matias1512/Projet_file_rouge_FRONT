@@ -11,6 +11,7 @@ import Home from "./components/Home";
 import AchievementsPage from "./components/Badges";
 import QCMExercise from "./components/QCMExercise";
 import Profile from "./components/Profile";
+import Challenge from "./components/Challenge";
 
 import { AuthProvider } from "./AuthContext"; // ✅ Ton contexte d'authentification
 import PrivateRoute from "./PrivateRoute"; // ✅ Pour protéger les routes privées
@@ -74,6 +75,14 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <QCMExercise />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/challenges"
+            element={
+              <PrivateRoute>
+                <Challenge />
               </PrivateRoute>
             }
           />

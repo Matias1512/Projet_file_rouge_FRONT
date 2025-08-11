@@ -54,7 +54,7 @@ const NavBar = () => {
     <Box as="nav" w="250px" minH="100vh" p={4} boxShadow="md" bg={useColorModeValue("gray.100", "gray.800")} color={textColor} borderRight="2px solid" borderRightColor="red.500">
       <VStack spacing={2} align="stretch">
         <NavItem href="/" icon={FaHome} label="MON COURS" active color={textColor} />
-        <NavItem href="#" icon={FaClock} label="DEFIS" color={textColor} />
+        <NavItem href="/challenges" icon={FaClock} label="DEFIS" color={textColor} />
         <NavItem href="/profile" icon={FaUser} label="PROFIL" color={textColor} />
         <NavItem href="/achievements" icon={FaTrophy} label="BADGE" color={textColor} />
         <NavItem 
