@@ -1,11 +1,10 @@
-import { Box, HStack, Text, Spinner, VStack, useColorModeValue, Flex } from "@chakra-ui/react"
+import { Box, HStack, Text, VStack, useColorModeValue, Flex } from "@chakra-ui/react"
 import { Editor } from "@monaco-editor/react"
 import { useRef, useState, useEffect } from "react";
 import LanguageSelector from "./LanguageSelector";
 import { CODE_SNIPPETS } from "../constants";
 import Output from "./Output";
 import HintText from "./HintText";
-import axios from "axios";
 
 const Challenge = () => {
     const editorRef = useRef()
@@ -49,10 +48,16 @@ fibonacci(8) = 21`,
     const exerciseTitleColor = useColorModeValue("orange.800", "orange.100")
     const exerciseDescColor = useColorModeValue("orange.600", "orange.200")
     const exerciseBadgeBg = useColorModeValue("orange.200", "orange.700")
-    const freeModeBoxBg = useColorModeValue("gray.50", "gray.700")
-    const freeModeTextColor = useColorModeValue("gray.600", "gray.300")
     const timerBg = useColorModeValue("red.100", "red.800")
     const timerColor = useColorModeValue("red.800", "red.100")
+    
+    // Colors for defeat and blocking messages - must be defined before early returns
+    const defeatTimerBg = useColorModeValue("red.100", "red.800")
+    const defeatTimerBorderColor = useColorModeValue("red.500", "red.400")
+    const defeatTimerColor = useColorModeValue("red.700", "red.200")
+    const defeatBoxBg = useColorModeValue("red.50", "red.900")
+    const defeatTitleColor = useColorModeValue("red.800", "red.100")
+    const defeatDescColor = useColorModeValue("red.600", "red.200")
 
     // Timer effect
     useEffect(() => {
@@ -75,21 +80,6 @@ fibonacci(8) = 21`,
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    // Function to map API language to Monaco Editor
-    const mapApiLanguageToMonaco = (apiLanguage) => {
-        const languageMap = {
-            'JAVA': 'java',
-            'JAVASCRIPT': 'javascript',
-            'TYPESCRIPT': 'typescript', 
-            'PYTHON': 'python',
-            'C#': 'csharp',
-            'CSHARP': 'csharp',
-            'PHP': 'php'
-        };
-        
-        const normalizedLanguage = apiLanguage?.toUpperCase();
-        return languageMap[normalizedLanguage] || 'javascript';
-    }
 
     // Check if challenge is blocked on component mount
     useEffect(() => {
@@ -212,18 +202,18 @@ fibonacci(8) = 21`,
             >
                 <Flex 
                     align="center" 
-                    bg={isDefeated ? useColorModeValue("red.100", "red.800") : timerBg} 
+                    bg={isDefeated ? defeatTimerBg : timerBg} 
                     px={4} 
                     py={3} 
                     borderRadius="xl" 
                     boxShadow="xl"
                     border="2px solid"
-                    borderColor={isDefeated ? useColorModeValue("red.500", "red.400") : useColorModeValue("red.300", "red.600")}
+                    borderColor={isDefeated ? defeatTimerBorderColor : timerBg}
                 >
                     <Text 
                         fontSize="2xl" 
                         fontWeight="bold" 
-                        color={isDefeated ? useColorModeValue("red.700", "red.200") : timerColor}
+                        color={isDefeated ? defeatTimerColor : timerColor}
                         fontFamily="mono"
                     >
                         {isDefeated ? "💥 TEMPS ÉCOULÉ" : `⏱️ ${formatTime(timeLeft)}`}
@@ -233,13 +223,13 @@ fibonacci(8) = 21`,
 
             {/* Defeat message */}
             {isDefeated && (
-                <Box p={4} bg={useColorModeValue("red.50", "red.900")} borderRadius="md" mb={4} mt={16} border="2px solid" borderColor="red.500">
+                <Box p={4} bg={defeatBoxBg} borderRadius="md" mb={4} mt={16} border="2px solid" borderColor="red.500">
                     <VStack align="center" spacing={3}>
                         <Text fontSize="3xl">💥</Text>
-                        <Text fontWeight="bold" color={useColorModeValue("red.800", "red.100")} fontSize="xl">
+                        <Text fontWeight="bold" color={defeatTitleColor} fontSize="xl">
                             DÉFI ÉCHOUÉ !
                         </Text>
-                        <Text color={useColorModeValue("red.600", "red.200")} textAlign="center">
+                        <Text color={defeatDescColor} textAlign="center">
                             Le temps est écoulé ! Vous ne pouvez pas accéder aux défis pendant 2 heures. 
                             Utilisez ce temps pour étudier et revenir plus fort !
                         </Text>
