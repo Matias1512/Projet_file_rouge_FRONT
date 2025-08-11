@@ -461,7 +461,7 @@ describe('CoursesCard', () => {
       render(<Home />, { wrapper: TestWrapper })
 
       await waitFor(() => {
-        const progressTexts = screen.getAllByText('0/9')
+        const progressTexts = screen.getAllByText('0%')
         expect(progressTexts).toHaveLength(4)
       })
     })
@@ -478,7 +478,7 @@ describe('CoursesCard', () => {
 
       await waitFor(() => {
         // Les barres de progression sont rendues par Chakra UI
-        expect(screen.getByText('0/9')).toBeInTheDocument()
+        expect(screen.getByText('0%')).toBeInTheDocument()
       })
     })
   })
