@@ -77,8 +77,12 @@ jobs:
         run: |
           cd devClass
           npm ci
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5.0.0
+      - name: Run tests with coverage
+        run: |
+          cd devClass
+          npm run test:coverage
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: devClass
         env:
