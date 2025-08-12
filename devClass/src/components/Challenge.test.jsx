@@ -1,35 +1,36 @@
 import { render, screen } from '@testing-library/react'
 import { vi, beforeEach, describe, it, expect } from 'vitest'
 import Challenge from './Challenge'
-
-// Mock dependencies
 import PropTypes from 'prop-types'
 
-vi.mock('@monaco-editor/react', () => {
-  const Editor = ({ onMount, onChange, value }) => {
-    const handleChange = (e) => {
-      onChange && onChange(e.target.value)
-    }
-    const handleMount = () => {
-      const mockEditor = { focus: vi.fn() }
-      onMount && onMount(mockEditor)
-    }
-    return (
-      <textarea
-        data-testid="monaco-editor"
-        defaultValue={value}
-        onChange={handleChange}
-        onFocus={handleMount}
-      />
-    )
+// Create mock component outside of vi.mock to avoid hoisting issues
+const MockEditor = ({ onMount, onChange, value }) => {
+  const handleChange = (e) => {
+    onChange && onChange(e.target.value)
   }
-  Editor.propTypes = {
-    onMount: PropTypes.func,
-    onChange: PropTypes.func,
-    value: PropTypes.string
+  const handleMount = () => {
+    const mockEditor = { focus: vi.fn() }
+    onMount && onMount(mockEditor)
   }
-  return { Editor }
-})
+  return (
+    <textarea
+      data-testid="monaco-editor"
+      defaultValue={value}
+      onChange={handleChange}
+      onFocus={handleMount}
+    />
+  )
+}
+
+MockEditor.propTypes = {
+  onMount: PropTypes.func,
+  onChange: PropTypes.func,
+  value: PropTypes.string
+}
+
+vi.mock('@monaco-editor/react', () => ({
+  Editor: MockEditor
+}))
 
 vi.mock('./LanguageSelector', () => ({
   default: ({ language, onSelect }) => (
