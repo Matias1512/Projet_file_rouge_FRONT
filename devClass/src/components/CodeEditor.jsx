@@ -6,12 +6,15 @@ import LanguageSelector from "./LanguageSelector";
 import { CODE_SNIPPETS } from "../constants";
 import Output from "./Output";
 import HintText from "./HintText";
+import BadgeNotification from "./BadgeNotification";
+import { useBadgeNotifications } from "../hooks/useBadgeNotifications";
 import axios from "axios";
 
 
 const CodeEditor = () => {
     const editorRef = useRef()
     const location = useLocation()
+    const { newBadges, isNotificationOpen, checkForNewBadges, closeNotification } = useBadgeNotifications();
     const [value, setvalue] = useState(CODE_SNIPPETS.javascript);
     const [language, setLanguage] = useState('javascript')
     const [exercise, setExercise] = useState(null)
@@ -149,10 +152,21 @@ const CodeEditor = () => {
                             }
                         />
                     </Box>
-                    <Output editorRef={editorRef} language={language} exercise={exercise}/>
+                    <Output 
+                        editorRef={editorRef} 
+                        language={language} 
+                        exercise={exercise}
+                        onCheckBadges={checkForNewBadges}
+                    />
                 </HStack>
             )}
             
+            {/* Badge Notifications */}
+            <BadgeNotification 
+                badges={newBadges}
+                isOpen={isNotificationOpen}
+                onClose={closeNotification}
+            />
         </Box>
     );
 };

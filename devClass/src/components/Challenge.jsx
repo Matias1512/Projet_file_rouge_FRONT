@@ -5,9 +5,12 @@ import LanguageSelector from "./LanguageSelector";
 import { CODE_SNIPPETS } from "../constants";
 import Output from "./Output";
 import HintText from "./HintText";
+import BadgeNotification from "./BadgeNotification";
+import { useBadgeNotifications } from "../hooks/useBadgeNotifications";
 
 const Challenge = () => {
     const editorRef = useRef()
+    const { newBadges, isNotificationOpen, checkForNewBadges, closeNotification } = useBadgeNotifications();
     const [value, setvalue] = useState(`function fibonacci(n) {
     // Complétez cette fonction pour calculer le n-ième nombre de Fibonacci
     // La suite: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34...
@@ -277,9 +280,17 @@ fibonacci(8) = 21`,
                             setIsCompleted(true);
                             setIsTimerActive(false);
                         }}
+                        onCheckBadges={checkForNewBadges}
                     />
                 </HStack>
             )}
+            
+            {/* Badge Notifications */}
+            <BadgeNotification 
+                badges={newBadges}
+                isOpen={isNotificationOpen}
+                onClose={closeNotification}
+            />
         </Box>
     );
 };

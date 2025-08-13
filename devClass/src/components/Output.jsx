@@ -6,7 +6,7 @@ import { executeCode, getUserExercises, updateUserExercise } from "../api";
 import { useAuth } from "../hooks/useAuth";
 import { CODE_SNIPPETS } from "../constants";
 
-const Output = ({editorRef, language, exercise, onChallengeCompleted}) => {
+const Output = ({editorRef, language, exercise, onChallengeCompleted, onCheckBadges}) => {
     const toast = useToast();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -256,6 +256,12 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted}) => {
         if (exercise && exercise.type === "challenge") {
             if (allPassed) {
                 setIsExerciseCompleted(true);
+                
+                // Déclencher la vérification des badges après un défi réussi
+                if (onCheckBadges) {
+                    onCheckBadges();
+                }
+                
                 // Stop the timer in the Challenge component
                 if (onChallengeCompleted) {
                     onChallengeCompleted();
@@ -287,6 +293,12 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted}) => {
                 if (userExercise && !userExercise.success) {
                     await updateUserExercise(userExercise.id, true);
                     setIsExerciseCompleted(true);
+                    
+                    // Déclencher la vérification des badges après un succès
+                    if (onCheckBadges) {
+                        onCheckBadges();
+                    }
+                    
                     toast({
                         title: "🎉 Exercice réussi !",
                         description: "Tous les tests sont passés. L'exercice a été marqué comme réussi.",
@@ -427,7 +439,8 @@ Output.propTypes = {
         starterCode: PropTypes.string,
         type: PropTypes.string
     }),
-    onChallengeCompleted: PropTypes.func
+    onChallengeCompleted: PropTypes.func,
+    onCheckBadges: PropTypes.func
 };
 
 export default Output;

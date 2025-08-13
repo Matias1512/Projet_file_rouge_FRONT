@@ -108,6 +108,15 @@ const mockExerciseNoStarterCode = {
   }
 }
 
+vi.mock('../hooks/useBadgeNotifications', () => ({
+  useBadgeNotifications: () => ({
+    newBadges: [],
+    isNotificationOpen: false,
+    checkForNewBadges: vi.fn(),
+    closeNotification: vi.fn()
+  })
+}))
+
 // Wrapper pour les tests
 const TestWrapper = ({ children }) => (
   <ChakraProvider>

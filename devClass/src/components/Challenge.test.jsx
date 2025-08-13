@@ -84,6 +84,15 @@ vi.mock('../constants', () => ({
   }
 }))
 
+vi.mock('../hooks/useBadgeNotifications', () => ({
+  useBadgeNotifications: () => ({
+    newBadges: [],
+    isNotificationOpen: false,
+    checkForNewBadges: vi.fn(),
+    closeNotification: vi.fn()
+  })
+}))
+
 describe('Challenge Component', () => {
   let mockLocalStorage = {}
 
