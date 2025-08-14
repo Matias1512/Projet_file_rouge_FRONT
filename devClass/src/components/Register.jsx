@@ -49,11 +49,12 @@ const Register = () => {
     const userData = {
       "username": name,
       "email": email,
-      "passwordHash": password,
-      "role": "user" // Envoi du mot de passe sous "passwordHash"
+      "password": password,
+      "role": "user"
     };
     axios.post("https://schooldev.duckdns.org/api/auth/register", userData)
-      .then(() => {
+      .then((response) => {
+        console.log("Réponse d'enregistrement:", response);
         toast({
           title: "Inscription réussie !",
           description: "Tu peux maintenant te connecter.",
@@ -64,17 +65,44 @@ const Register = () => {
         navigate("/login");
       })
       .catch(error => {
-        toast({
-          title: "Erreur",
-          description: error.response?.data?.message || "Une erreur est survenue.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        console.error("Erreur d'enregistrement:", error);
+        console.error("Statut de l'erreur:", error.response?.status);
+        console.error("Données de l'erreur:", error.response?.data);
+        
+        // Vérifier si l'erreur est vraiment un échec ou juste un problème de routage
+        if (error.response?.status === 404) {
+          // Erreur 404 - l'endpoint n'existe peut-être pas mais l'utilisateur pourrait être créé
+          toast({
+            title: "Attention",
+            description: "L'inscription a peut-être réussi. Essayez de vous connecter.",
+            status: "warning",
+            duration: 5000,
+            isClosable: true,
+          });
+          navigate("/login");
+        } else if (error.response?.status === 409) {
+          // Conflit - utilisateur existe déjà
+          toast({
+            title: "Erreur",
+            description: "Cet utilisateur existe déjà.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else {
+          // Autres erreurs
+          toast({
+            title: "Erreur",
+            description: error.response?.data?.message || "Une erreur est survenue lors de l'inscription.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
       })
       .finally(() => {
         setLoading(false);
-      }); // Met l'état de chargement à faux après la requête
+      });
   };
 
   return (
