@@ -49,7 +49,7 @@ const Register = () => {
     const userData = {
       "username": name,
       "email": email,
-      "password": password,
+      "passwordHash": password,
       "role": "user"
     };
     axios.post("https://schooldev.duckdns.org/api/auth/register", userData)
