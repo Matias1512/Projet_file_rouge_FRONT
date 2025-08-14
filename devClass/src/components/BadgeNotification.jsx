@@ -10,8 +10,7 @@ import {
   HStack,
   Text,
   Box,
-  Badge,
-  useDisclosure
+  Badge
 } from "@chakra-ui/react";
 import { FaTrophy, FaStar, FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaBolt, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaTarget, FaCompass } from "react-icons/fa";
 import PropTypes from 'prop-types';

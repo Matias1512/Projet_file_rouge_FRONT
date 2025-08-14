@@ -1,5 +1,5 @@
 import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast, Spinner, Alert, AlertIcon } from "@chakra-ui/react";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaStar, FaBolt, FaLock, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaTarget, FaCompass } from "react-icons/fa";
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -28,7 +28,7 @@ const getIcon = (iconName, size = 32) => {
 };
 
 const AchievementCard = ({ achievement }) => {
-  const { badge, current, unlocked } = achievement;
+  const { badge, current } = achievement;
   const { title, description, icon, level, color, total } = badge;
   const progress = Math.round((current / total) * 100);
 
@@ -128,13 +128,7 @@ const AchievementsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (user && user.userId) {
-      fetchUserBadges();
-    }
-  }, [user]);
-
-  const fetchUserBadges = async () => {
+  const fetchUserBadges = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -155,7 +149,13 @@ const AchievementsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
+
+  useEffect(() => {
+    if (user && user.userId) {
+      fetchUserBadges();
+    }
+  }, [user, fetchUserBadges]);
 
   if (loading) {
     return (
