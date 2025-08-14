@@ -12,7 +12,7 @@ import {
   Box,
   Badge
 } from "@chakra-ui/react";
-import { FaTrophy, FaStar, FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaBolt, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaTarget, FaCompass } from "react-icons/fa";
+import { FaTrophy, FaStar, FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaBolt, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaCompass } from "react-icons/fa";
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 
@@ -31,7 +31,7 @@ const getIcon = (iconName, size = 32) => {
     'FaLeaf': <FaLeaf size={size} />,
     'FaHeart': <FaHeart size={size} />,
     'FaCheckCircle': <FaCheckCircle size={size} />,
-    'FaTarget': <FaTarget size={size} />,
+    'FaTarget': <FaBullseye size={size} />,
     'FaCompass': <FaCompass size={size} />
   };
   

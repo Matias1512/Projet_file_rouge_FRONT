@@ -1,6 +1,6 @@
 import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast, Spinner, Alert, AlertIcon } from "@chakra-ui/react";
 import { useState, useEffect, useContext, useCallback } from "react";
-import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaStar, FaBolt, FaLock, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaTarget, FaCompass } from "react-icons/fa";
+import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaStar, FaBolt, FaLock, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaCompass } from "react-icons/fa";
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
@@ -20,7 +20,7 @@ const getIcon = (iconName, size = 32) => {
     'FaLeaf': <FaLeaf size={size} />,
     'FaHeart': <FaHeart size={size} />,
     'FaCheckCircle': <FaCheckCircle size={size} />,
-    'FaTarget': <FaTarget size={size} />,
+    'FaTarget': <FaBullseye size={size} />,
     'FaCompass': <FaCompass size={size} />
   };
   
