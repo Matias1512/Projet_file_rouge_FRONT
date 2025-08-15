@@ -86,7 +86,7 @@ const LayoutNavBar = ({ children }) => {
 };
 
 LayoutNavBar.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node
 };
 
 export { NavBar, LayoutNavBar };

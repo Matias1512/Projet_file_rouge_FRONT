@@ -17,12 +17,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import axios from "axios";
 import { createUserExercise, getUserExercises, updateUserExercise } from "../api";
+import { useBadgeNotifications } from "../hooks/useBadgeNotifications";
+import BadgeNotification from "./BadgeNotification";
 
 const QCMExercise = () => {
   const { exerciseId } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, logout, isLoading, user } = useAuth();
   const toast = useToast();
+  const { newBadges, isNotificationOpen, checkForNewBadges, closeNotification } = useBadgeNotifications();
 
   const [exercise, setExercise] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState("");
@@ -129,6 +132,11 @@ const QCMExercise = () => {
         try {
           await updateUserExercise(userExercise.id, true);
           console.log('UserExercise mis à jour avec success=true');
+          
+          // Déclencher la vérification des badges après succès QCM
+          if (checkForNewBadges) {
+            checkForNewBadges();
+          }
         } catch (updateError) {
           console.warn('Erreur lors de la mise à jour du UserExercise:', updateError);
         }
@@ -278,6 +286,13 @@ const QCMExercise = () => {
             </Button>
           </Flex>
         </VStack>
+        
+        {/* Notification des nouveaux badges */}
+        <BadgeNotification 
+          badges={newBadges} 
+          isOpen={isNotificationOpen} 
+          onClose={closeNotification} 
+        />
       </Box>
     );
   }
@@ -361,6 +376,13 @@ const QCMExercise = () => {
             Valider ma réponse
           </Button>
         </Flex>
+        
+        {/* Notification des nouveaux badges */}
+        <BadgeNotification 
+          badges={newBadges} 
+          isOpen={isNotificationOpen} 
+          onClose={closeNotification} 
+        />
       </VStack>
     </Box>
   );

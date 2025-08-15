@@ -1,4 +1,4 @@
-import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast, Spinner, Alert, AlertIcon } from "@chakra-ui/react";
+import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast, Spinner, Alert, AlertIcon, useColorModeValue } from "@chakra-ui/react";
 import { useState, useEffect, useContext, useCallback } from "react";
 import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaStar, FaBolt, FaLock, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaCompass } from "react-icons/fa";
 import PropTypes from 'prop-types';
@@ -31,13 +31,19 @@ const AchievementCard = ({ achievement }) => {
   const { badge, current } = achievement;
   const { title, description, icon, level, color, total } = badge;
   const progress = Math.round((current / total) * 100);
+  
+  const cardBg = useColorModeValue("white", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const badgeBg = useColorModeValue("white", "white");
+  const badgeColor = useColorModeValue("gray.800", "gray.800");
+  const badgeBorderColor = useColorModeValue("gray.200", "gray.200");
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg" overflow="hidden">
+    <Box p={4} borderWidth="1px" borderRadius="lg" overflow="hidden" bg={cardBg} borderColor={borderColor}>
       <Flex alignItems="center">
         <Box p={3} bg={color} borderRadius="lg" color="white" position="relative">
           {getIcon(icon)}
-          <Badge position="absolute" bottom={-1} right={-1} bg="white" color="gray.800" fontSize="xs" px={1.5} py={0.5} border="1px solid" borderColor="gray.200">
+          <Badge position="absolute" bottom={-1} right={-1} bg={badgeBg} color={badgeColor} fontSize="xs" px={1.5} py={0.5} border="1px solid" borderColor={badgeBorderColor}>
             {level}
           </Badge>
         </Box>
@@ -47,7 +53,12 @@ const AchievementCard = ({ achievement }) => {
             <Text fontSize="sm" color="gray.500">{current}/{total}</Text>
           </Flex>
           <Text fontSize="sm" color="gray.500" mb={2}>{description}</Text>
-          <Progress value={progress} size="sm" colorScheme={color.replace(".500", "")} />
+          <Progress 
+            value={progress} 
+            size="sm" 
+            colorScheme={color.split(".")[0]} 
+            bg={useColorModeValue("gray.200", "gray.600")}
+          />
         </Box>
       </Flex>
     </Box>
@@ -74,21 +85,31 @@ const AchievementLocked = ({ achievement }) => {
   const { title, description, icon, level, unlockRequirement, total } = badge;
   const progress = Math.round((current / total) * 100);
   
+  const cardBg = useColorModeValue("gray.100", "gray.800");
+  const iconBg = useColorModeValue("gray.300", "gray.600");
+  const iconColor = useColorModeValue("gray.500", "gray.400");
+  const titleColor = useColorModeValue("gray.500", "gray.400");
+  const lockIconColor = useColorModeValue("gray.400", "gray.500");
+  const badgeBg = useColorModeValue("white", "white");
+  const badgeColor = useColorModeValue("gray.800", "gray.800");
+  const badgeBorderColor = useColorModeValue("gray.200", "gray.200");
+  const borderColor = useColorModeValue("gray.300", "gray.600");
+  
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.100" borderStyle="dashed">
+    <Box p={4} borderWidth="1px" borderRadius="lg" bg={cardBg} borderStyle="dashed" borderColor={borderColor}>
       <Flex alignItems="center">
-        <Box p={3} bg="gray.300" borderRadius="lg" color="gray.500" position="relative">
+        <Box p={3} bg={iconBg} borderRadius="lg" color={iconColor} position="relative">
           {getIcon(icon)}
-          <Badge position="absolute" bottom={-1} right={-1} bg="white" color="gray.800" fontSize="xs" px={1.5} py={0.5} border="1px solid" borderColor="gray.200">
+          <Badge position="absolute" bottom={-1} right={-1} bg={badgeBg} color={badgeColor} fontSize="xs" px={1.5} py={0.5} border="1px solid" borderColor={badgeBorderColor}>
             {level}
           </Badge>
         </Box>
         <Box ml={4} flex={1}>
           <Flex justifyContent="space-between" alignItems="center" mb={1}>
             <Flex alignItems="center">
-              <Heading size="md" color="gray.500">{title}</Heading>
+              <Heading size="md" color={titleColor}>{title}</Heading>
               <Box ml={2}>
-                <FaLock color="gray.400" />
+                <FaLock color={lockIconColor} />
               </Box>
             </Flex>
             <Text fontSize="sm" color="gray.500">{current}/{total}</Text>
@@ -99,7 +120,7 @@ const AchievementLocked = ({ achievement }) => {
               Condition: {unlockRequirement.replace(/_/g, ' ').replace(':', ' - ')}
             </Text>
           )}
-          <Progress value={progress} size="sm" colorScheme="gray" />
+          <Progress value={progress} size="sm" colorScheme="gray" bg={useColorModeValue("gray.200", "gray.600")} />
         </Box>
       </Flex>
     </Box>
