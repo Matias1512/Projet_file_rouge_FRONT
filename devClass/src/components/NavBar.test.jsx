@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import { FaHome, FaClock, FaTrophy, FaUser, FaSun, FaMoon, FaSignOutAlt } from 'react-icons/fa'
 import { NavBar, LayoutNavBar } from './NavBar'
 
 // Mock des modules

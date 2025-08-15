@@ -169,7 +169,6 @@ describe('Register', () => {
     it('initially shows password fields as password type', () => {
       render(<Register />, { wrapper: TestWrapper })
       
-      const passwordInputs = screen.getAllByDisplayValue('')
       const passwordInput = screen.getByPlaceholderText('Mot de passe')
       const confirmPasswordInput = screen.getByPlaceholderText('Confirmer le mot de passe')
       

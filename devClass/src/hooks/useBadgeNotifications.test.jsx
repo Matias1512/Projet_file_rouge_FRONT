@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import React, { createContext } from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import { useBadgeNotifications } from './useBadgeNotifications'
 import { AuthContext } from '../AuthContext'
@@ -19,11 +19,18 @@ afterEach(() => {
 
 // Helper function to create a wrapper with AuthContext
 const createWrapper = (userValue) => {
-  return ({ children }) => (
+  const TestWrapper = ({ children }) => (
     <AuthContext.Provider value={{ user: userValue }}>
       {children}
     </AuthContext.Provider>
   )
+  
+  TestWrapper.displayName = 'TestWrapper'
+  TestWrapper.propTypes = {
+    children: PropTypes.node.isRequired
+  }
+  
+  return TestWrapper
 }
 
 describe('useBadgeNotifications', () => {
@@ -388,6 +395,11 @@ describe('useBadgeNotifications', () => {
           {children}
         </AuthContext.Provider>
       )
+      
+      TestComponent.displayName = 'TestComponent'
+      TestComponent.propTypes = {
+        children: PropTypes.node.isRequired
+      }
       
       const { result, rerender } = renderHook(() => useBadgeNotifications(), {
         wrapper: TestComponent
