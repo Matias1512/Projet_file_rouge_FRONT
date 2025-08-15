@@ -7,7 +7,7 @@ const API = axios.create({
 
 
 export const executeCode = async (language, sourceCode) => {
-    const response = await API.post("/execute", {
+    const payload = {
         "language": language,
         "version": LANGUAGE_VERSIONS[language],
         "files": [
@@ -15,7 +15,15 @@ export const executeCode = async (language, sourceCode) => {
             "content": sourceCode
             }
         ],
-    });
+    };
+
+    // Ajouter l'encodage UTF-8 pour Java pour supporter les caractères français
+    if (language === "java") {
+        payload.compile_options = ["-encoding", "UTF-8"];
+        payload.run_options = ["-Dfile.encoding=UTF-8"];
+    }
+
+    const response = await API.post("/execute", payload);
     return response.data;
 }
 
