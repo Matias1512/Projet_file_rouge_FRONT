@@ -1,31 +1,10 @@
 import { Box, Flex, Text, Progress, Badge, Button, Container, Heading, VStack, useToast, Spinner, Alert, AlertIcon, useColorModeValue } from "@chakra-ui/react";
 import { useState, useEffect, useContext, useCallback } from "react";
-import { FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaTrophy, FaStar, FaBolt, FaLock, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaCompass } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
-
-// Mapping des icônes
-const getIcon = (iconName, size = 32) => {
-  const iconMap = {
-    'FaFire': <FaFire size={size} />,
-    'FaFlask': <FaFlask size={size} />,
-    'FaFileAlt': <FaFileAlt size={size} />,
-    'FaShieldAlt': <FaShieldAlt size={size} />,
-    'FaBullseye': <FaBullseye size={size} />,
-    'FaTrophy': <FaTrophy size={size} />,
-    'FaStar': <FaStar size={size} />,
-    'FaBolt': <FaBolt size={size} />,
-    'FaPlay': <FaPlay size={size} />,
-    'FaLeaf': <FaLeaf size={size} />,
-    'FaHeart': <FaHeart size={size} />,
-    'FaCheckCircle': <FaCheckCircle size={size} />,
-    'FaTarget': <FaBullseye size={size} />,
-    'FaCompass': <FaCompass size={size} />
-  };
-  
-  return iconMap[iconName] || <FaStar size={size} />;
-};
+import { getIcon } from '../utils/iconUtils';
 
 const AchievementCard = ({ achievement }) => {
   const { badge, current } = achievement;
@@ -241,4 +220,5 @@ const AchievementsPage = () => {
   );
 };
 
+export { AchievementCard, AchievementLocked };
 export default AchievementsPage;
