@@ -35,7 +35,7 @@ vi.mock('@chakra-ui/react', async () => {
   const actual = await vi.importActual('@chakra-ui/react')
   return {
     ...actual,
-    useColorModeValue: vi.fn().mockImplementation((light, dark) => light)
+    useColorModeValue: vi.fn().mockImplementation((light) => light)
   }
 })
 
