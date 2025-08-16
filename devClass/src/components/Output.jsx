@@ -79,7 +79,7 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted, onCheckBad
             // Test 1: Vérifier que l'output contient les messages attendus
             const expectedOutput = testCases.trim();
             // Normaliser les sauts de ligne et supprimer les espaces en trop
-            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').replace(/\n+$/, '').trim();
+            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').trimEnd();
             const normalizedExpected = expectedOutput.replace(/\r\n/g, '\n').replace(/^ +/gm, '').trim();
             const outputMatches = normalizedActual === normalizedExpected;
             
@@ -109,7 +109,7 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted, onCheckBad
             
             // Test 1: Vérifier que l'output contient la valeur attendue
             const expectedOutput = testCases.trim();
-            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').replace(/\n+$/, '').trim();
+            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').trimEnd();
             const normalizedExpected = expectedOutput.replace(/\r\n/g, '\n').trim();
             const outputMatches = normalizedActual === normalizedExpected;
             
@@ -199,7 +199,7 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted, onCheckBad
             
             // Test 1: Vérifier que l'output contient la valeur attendue
             const expectedOutput = testCases.trim();
-            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').replace(/\n+$/, '').trim();
+            const normalizedActual = actualOutput.replace(/\r\n/g, '\n').trimEnd();
             const normalizedExpected = expectedOutput.replace(/\r\n/g, '\n').trim();
             const outputMatches = normalizedActual === normalizedExpected;
             
