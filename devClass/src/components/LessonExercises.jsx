@@ -207,7 +207,7 @@ const LessonExercises = () => {
           ) : (
             <VStack spacing={6} mt={6} align="center">
               {exercises.map((exercise, index) => {
-                const isUnlocked = isExerciseUnlocked(index, exercise);
+                const isUnlocked = isExerciseUnlocked(index);
                 const isCompleted = isExerciseCompleted(exercise);
                 
                 return (
