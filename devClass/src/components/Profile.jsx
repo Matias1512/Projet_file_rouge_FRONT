@@ -302,4 +302,5 @@ const Profile = () => {
   );
 };
 
+export { ProfileInfoItem };
 export default Profile;
