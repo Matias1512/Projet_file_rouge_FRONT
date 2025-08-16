@@ -12,31 +12,10 @@ import {
   Box,
   Badge
 } from "@chakra-ui/react";
-import { FaTrophy, FaStar, FaFire, FaFlask, FaFileAlt, FaShieldAlt, FaBullseye, FaBolt, FaPlay, FaLeaf, FaHeart, FaCheckCircle, FaCompass } from "react-icons/fa";
+import { FaTrophy } from "react-icons/fa";
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
-
-// Mapping des icônes (réutilisé depuis Badges.jsx)
-const getIcon = (iconName, size = 32) => {
-  const iconMap = {
-    'FaFire': <FaFire size={size} />,
-    'FaFlask': <FaFlask size={size} />,
-    'FaFileAlt': <FaFileAlt size={size} />,
-    'FaShieldAlt': <FaShieldAlt size={size} />,
-    'FaBullseye': <FaBullseye size={size} />,
-    'FaTrophy': <FaTrophy size={size} />,
-    'FaStar': <FaStar size={size} />,
-    'FaBolt': <FaBolt size={size} />,
-    'FaPlay': <FaPlay size={size} />,
-    'FaLeaf': <FaLeaf size={size} />,
-    'FaHeart': <FaHeart size={size} />,
-    'FaCheckCircle': <FaCheckCircle size={size} />,
-    'FaTarget': <FaBullseye size={size} />,
-    'FaCompass': <FaCompass size={size} />
-  };
-  
-  return iconMap[iconName] || <FaStar size={size} />;
-};
+import { getIcon } from '../utils/iconUtils';
 
 const BadgeNotification = ({ badges, isOpen, onClose }) => {
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(0);
