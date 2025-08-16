@@ -263,7 +263,6 @@ describe('AuthContext', () => {
   describe('login function', () => {
     it('should login with valid token', async () => {
       const payload = { userId: 123, username: 'testuser' }
-      const token = createMockJWT(payload)
       
       window.atob.mockImplementation((str) => {
         if (str === btoa(JSON.stringify(payload))) {
