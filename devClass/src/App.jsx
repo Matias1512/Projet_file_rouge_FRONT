@@ -63,7 +63,7 @@ function AppContent() {
             }
           />
           <Route
-            path="/lessons"
+            path="/lessons/:courseId"
             element={
               <PrivateRoute>
                 <Lessons />

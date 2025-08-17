@@ -223,7 +223,7 @@ function CoursesCard({ course, isLocked, progress }) {
           size="md" 
           fontWeight="bold" 
           px={8}
-          onClick={() => !isLocked && navigate("/lessons")}
+          onClick={() => !isLocked && navigate(`/lessons/${course.courseId}`)}
           disabled={isLocked}
         >
           {isLocked ? "VERROUILLÉ" : "CONTINUER"}

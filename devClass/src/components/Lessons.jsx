@@ -2,7 +2,7 @@ import { Box, VStack, Text, Icon, Flex, Button, Spinner } from "@chakra-ui/react
 import { FaBook, FaDumbbell, FaStar } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { createUserExercise, getUserExercises } from "../api";
 
@@ -21,8 +21,10 @@ const Lessons = () => {
   const [exercisesByLesson, setExercisesByLesson] = useState({});
   const [loadingExercises, setLoadingExercises] = useState({});
   const [userExercises, setUserExercises] = useState([]);
+  const [loadingLessons, setLoadingLessons] = useState(true);
   const { isAuthenticated, logout, isLoading, user } = useAuth();
   const navigate = useNavigate();
+  const { courseId } = useParams();
   const getLessonColor = (language) => {
     if (language?.toLowerCase() === 'java') {
       return "red.400";
@@ -92,7 +94,17 @@ const Lessons = () => {
 
     const fetchLessons = async () => {
       try {
-        const response = await axios.get('https://schooldev.duckdns.org/api/lessons');
+        setLoadingLessons(true);
+        
+        // Vérifier que courseId est fourni
+        if (!courseId) {
+          console.error('CourseId manquant dans l\'URL');
+          navigate('/');
+          return;
+        }
+
+        // Récupérer les leçons spécifiques au cours
+        const response = await axios.get(`https://schooldev.duckdns.org/api/lessons/course/${courseId}`);
         setLessons(response.data);
         
         // Récupérer les exercices pour chaque leçon
@@ -139,11 +151,13 @@ const Lessons = () => {
           logout();
           navigate('/login');
         }
+      } finally {
+        setLoadingLessons(false);
       }
     };
 
     fetchLessons();
-  }, [isAuthenticated, logout, navigate, isLoading, user]);
+  }, [isAuthenticated, logout, navigate, isLoading, user, courseId]);
 
   const handleExerciseStart = async (exercise) => {
     if (user && user.userId && exercise.exerciseId) {
@@ -172,10 +186,23 @@ const Lessons = () => {
     }
   };
 
+  if (isLoading || loadingLessons) {
+    return (
+      <Box minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <Flex align="center" gap={3}>
+          <Spinner size="md" />
+          <Text>Chargement des leçons...</Text>
+        </Flex>
+      </Box>
+    );
+  }
+
   if (lessons.length === 0) {
     return (
       <Box minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
-        <Text>Chargement des leçons...</Text>
+        <Text fontSize="xl" color="gray.500" textAlign="center">
+          Aucune lessons pour le moment
+        </Text>
       </Box>
     );
   }

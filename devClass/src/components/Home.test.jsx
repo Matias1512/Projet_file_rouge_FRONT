@@ -424,7 +424,7 @@ describe('CoursesCard', () => {
       const continueButton = screen.getByRole('button', { name: /continuer/i })
       fireEvent.click(continueButton)
 
-      expect(mockNavigate).toHaveBeenCalledWith('/lessons')
+      expect(mockNavigate).toHaveBeenCalledWith('/lessons/1')
     })
 
     it('ne navigue pas quand on clique sur un cours verrouillé', async () => {
@@ -445,7 +445,7 @@ describe('CoursesCard', () => {
       const lockedButton = screen.getByRole('button', { name: /verrouillé/i })
       fireEvent.click(lockedButton)
 
-      expect(mockNavigate).not.toHaveBeenCalledWith('/lessons')
+      expect(mockNavigate).not.toHaveBeenCalledWith('/lessons/2')
     })
   })
 

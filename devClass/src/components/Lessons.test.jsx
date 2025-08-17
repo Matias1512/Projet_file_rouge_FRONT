@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { ChakraProvider } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
@@ -12,7 +12,8 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
   return {
     ...actual,
-    useNavigate: vi.fn()
+    useNavigate: vi.fn(),
+    useParams: vi.fn()
   }
 })
 vi.mock('../hooks/useAuth')
@@ -21,7 +22,7 @@ vi.mock('../api', () => ({
   getUserExercises: vi.fn()
 }))
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { createUserExercise, getUserExercises } from '../api'
 
@@ -71,16 +72,17 @@ const mockUser = {
 }
 
 // Wrapper pour les tests
-const TestWrapper = ({ children }) => (
+const TestWrapper = ({ children, courseId = '1' }) => (
   <ChakraProvider>
-    <BrowserRouter>
+    <MemoryRouter initialEntries={[`/lessons/${courseId}`]}>
       {children}
-    </BrowserRouter>
+    </MemoryRouter>
   </ChakraProvider>
 )
 
 TestWrapper.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  courseId: PropTypes.string
 }
 
 describe('Lessons Component', () => {
@@ -89,6 +91,7 @@ describe('Lessons Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useNavigate.mockReturnValue(mockNavigate)
+    useParams.mockReturnValue({ courseId: '1' })
     axios.get.mockClear()
     createUserExercise.mockClear()
     getUserExercises.mockClear()
@@ -120,6 +123,20 @@ describe('Lessons Component', () => {
       
       expect(axios.get).not.toHaveBeenCalled()
     })
+
+    it('redirige vers home si courseId manquant', () => {
+      useParams.mockReturnValue({ courseId: undefined })
+      useAuth.mockReturnValue({
+        isAuthenticated: true,
+        isLoading: false,
+        logout: vi.fn(),
+        user: mockUser
+      })
+
+      render(<Lessons />, { wrapper: TestWrapper })
+      
+      expect(mockNavigate).toHaveBeenCalledWith('/')
+    })
   })
 
   describe('Chargement des données', () => {
@@ -134,7 +151,7 @@ describe('Lessons Component', () => {
 
     it('charge et affiche les leçons avec succès', async () => {
       axios.get.mockImplementation((url) => {
-        if (url.includes('/lessons')) {
+        if (url.includes('/lessons/course/1')) {
           return Promise.resolve({ data: mockLessons })
         }
         if (url.includes('/exercises/lesson/')) {
@@ -188,7 +205,7 @@ describe('Lessons Component', () => {
       })
       
       axios.get.mockImplementation((url) => {
-        if (url.includes('/lessons')) {
+        if (url.includes('/lessons/course/1')) {
           return Promise.resolve({ data: [mockLessons[0]] })
         }
         if (url.includes('/exercises/lesson/1')) {
@@ -214,7 +231,7 @@ describe('Lessons Component', () => {
 
     it('navigue vers QCM pour un exercice de type qcm', async () => {
       axios.get.mockImplementation((url) => {
-        if (url.includes('/lessons')) {
+        if (url.includes('/lessons/course/1')) {
           return Promise.resolve({ data: [mockLessons[1]] })
         }
         if (url.includes('/exercises/lesson/2')) {
@@ -244,7 +261,7 @@ describe('Lessons Component', () => {
       })
       
       axios.get.mockImplementation((url) => {
-        if (url.includes('/lessons')) {
+        if (url.includes('/lessons/course/1')) {
           return Promise.resolve({ data: [mockLessons[0]] })
         }
         if (url.includes('/exercises/lesson/1')) {
@@ -286,7 +303,7 @@ describe('Lessons Component', () => {
       })
       
       axios.get.mockImplementation((url) => {
-        if (url.includes('/lessons')) {
+        if (url.includes('/lessons/course/1')) {
           return Promise.resolve({ data: [mockLessons[0]] })
         }
         if (url.includes('/exercises/lesson/1')) {
@@ -335,7 +352,7 @@ describe('Lessons Component', () => {
       })
       
       axios.get.mockImplementation((url) => {
-        if (url.includes('/lessons')) {
+        if (url.includes('/lessons/course/1')) {
           return Promise.resolve({ data: mockLessons })
         }
         if (url.includes('/exercises/lesson/')) {
