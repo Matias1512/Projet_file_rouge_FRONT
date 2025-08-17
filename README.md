@@ -1,5 +1,92 @@
 # Projet_file_rouge_FRONT
 
+## Aperçu du Projet
+
+SchoolDev (**DevClass**) est une plateforme éducative basée sur React pour l'apprentissage des langages de programmation. L'application fournit un éditeur de code interactif, des leçons, un système d'authentification des utilisateurs et un système de suivi des progrès.
+
+## Commandes de Développement
+
+**Important :** Le code source principal se trouve dans le sous-répertoire `devClass/`, pas dans la racine.
+
+```bash
+# Naviguer vers le répertoire principal du projet
+cd devClass/
+
+# Installer les dépendances
+npm ci
+
+# Démarrer le serveur de développement
+npm run dev
+
+# Construire pour la production
+npm run build
+
+# Analyser le code
+npm run lint
+
+# Prévisualiser la version de production
+npm run preview
+```
+
+## Aperçu de l'Architecture
+
+### Système d'Authentification
+- **Authentification basée sur le contexte** utilisant `AuthContext.jsx`
+- Tokens JWT stockés dans localStorage avec validation automatique
+- Les intercepteurs Axios attachent automatiquement les en-têtes d'authentification
+- Le composant `PrivateRoute` protège les routes authentifiées
+- API Backend : `https://schooldev.duckdns.org/api/`
+
+### Main Application Structure
+- **App.jsx**: Main router with conditional navbar rendering based on route
+- **LayoutWithNavbar**: Shared layout wrapper for authenticated pages
+- **Routes:**
+  - `/login`, `/register`: Public authentication pages
+  - `/`: Home dashboard (protected)
+  - `/editor`: Monaco-based code editor (protected)  
+  - `/lessons`: Learning path with exercises (protected)
+  - `/achievements`: User badges/achievements (protected)
+
+### Code Editor Features
+- Multi-language support (JavaScript, TypeScript, Python, Java, C#, PHP)
+- Monaco Editor integration with syntax highlighting
+- Code execution via Piston API (`https://emkc.org/api/v2/piston`)
+- Language-specific code snippets and version management
+- Real-time output display
+
+### Key Components
+- **CodeEditor.jsx**: Main editor interface with language selector
+- **Output.jsx**: Code execution results display
+- **LanguageSelector.jsx**: Programming language picker
+- **Home.jsx**: Dashboard with course listings from backend API
+- **Lessons.jsx**: Interactive learning path with exercise progression
+- **Badges.jsx**: Achievement/badge display system
+
+### API Integration
+- Main backend: `https://schooldev.duckdns.org/api/`
+- Code execution: Piston API for running user code safely
+- Automatic token validation on app startup
+- Error handling with automatic logout on auth failures
+
+### Docker Configuration
+- Multi-stage build (Node.js build + Nginx production)
+- Non-root user for security
+- Production-ready Nginx configuration
+- Optimized for CI/CD deployment
+
+### Code Quality Tools
+- ESLint configuration for React/JSX
+- SonarQube integration (`sonar-project.properties`)
+- Project key: `schooldev_front`
+
+## Notes de développement
+
+- Tout le code source principal se trouve dans `devClass/src/`
+- L'état d'authentification est géré globalement via React Context
+- L'application valide les jetons JWT au démarrage et redirige automatiquement vers la page de connexion s'ils ne sont pas valides
+- L'éditeur de code prend en charge l'exécution sécurisée via l'API Piston conteneurisée
+- Les routes sont rendues de manière conditionnelle en fonction du statut d'authentification
+
 ## C2.1.1 Mettre en œuvre des environnements de déploiement et de test en y intégrant les outils de suivi de performance et de qualité afin de permettre le bon déroulement de la phase de développement du logiciel
 
 ### Environnement de développement
