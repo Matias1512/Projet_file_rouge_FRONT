@@ -730,7 +730,12 @@ describe('Output Component', () => {
 
     const exerciseWithTestCases = {
       exerciseId: 1,
-      testCases: 'Expected Output'
+      testCases: 'Expected Output',
+      lesson: {
+        course: {
+          courseId: 1
+        }
+      }
     }
 
     render(
@@ -755,7 +760,7 @@ describe('Output Component', () => {
       fireEvent.click(returnButton)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith('/lessons')
+    expect(mockNavigate).toHaveBeenCalledWith('/lessons/1')
   })
 
   it('displays completed challenge alert', async () => {

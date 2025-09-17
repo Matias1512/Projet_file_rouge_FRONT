@@ -51,6 +51,11 @@ const mockExercise = {
   title: 'Test QCM Exercise',
   description: 'This is a test QCM exercise',
   type: 'QCM',
+  lesson: {
+    course: {
+      courseId: 1
+    }
+  },
   propositions: [
     {
       propositionId: 1,
@@ -914,7 +919,7 @@ describe('QCMExercise', () => {
       const backButton = screen.getByRole('button', { name: /retour aux leçons/i })
       fireEvent.click(backButton)
 
-      expect(mockNavigate).toHaveBeenCalledWith('/lessons')
+      expect(mockNavigate).toHaveBeenCalledWith('/lessons/1')
     })
 
     it('navigates back to lessons from results view', async () => {
@@ -937,7 +942,7 @@ describe('QCMExercise', () => {
       const backButton = screen.getByRole('button', { name: /retour aux leçons/i })
       fireEvent.click(backButton)
 
-      expect(mockNavigate).toHaveBeenCalledWith('/lessons')
+      expect(mockNavigate).toHaveBeenCalledWith('/lessons/1')
     })
 
     it('restarts exercise from results view', async () => {

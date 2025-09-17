@@ -67,7 +67,12 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted, onCheckBad
     
     const handleReturnToLessons = () => {
         // L'exercice a toujours l'ID d'un cours - naviguer vers le courseId
-        navigate(`/lessons/${exercise.lesson.course.courseId}`);
+        if (exercise && exercise.lesson && exercise.lesson.course && exercise.lesson.course.courseId) {
+            navigate(`/lessons/${exercise.lesson.course.courseId}`);
+        } else {
+            // Fallback vers la route générale si la structure n'est pas disponible
+            navigate('/lessons');
+        }
     };
     
     const checkTestCases = async (actualOutput, testCases) => {
