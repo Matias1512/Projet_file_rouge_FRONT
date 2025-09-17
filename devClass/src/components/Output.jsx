@@ -66,8 +66,8 @@ const Output = ({editorRef, language, exercise, onChallengeCompleted, onCheckBad
     };
     
     const handleReturnToLessons = () => {
-        // Si l'exercice contient des informations sur le cours, naviguer vers ce cours
-        navigate(`/lessons/${exercise.lesson.lessonId}`);
+        // L'exercice a toujours l'ID d'un cours - naviguer vers le courseId
+        navigate(`/lessons/${exercise.lesson.course.courseId}`);
     };
     
     const checkTestCases = async (actualOutput, testCases) => {
@@ -440,7 +440,6 @@ Output.propTypes = {
         starterCode: PropTypes.string,
         type: PropTypes.string,
         lesson: PropTypes.shape({
-            lessonId: PropTypes.number,
             course: PropTypes.shape({
                 courseId: PropTypes.number
             })

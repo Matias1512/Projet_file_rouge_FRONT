@@ -275,7 +275,7 @@ const QCMExercise = () => {
           </Box>
 
           <Flex gap={4}>
-            <Button onClick={() => navigate('/lessons')} variant="outline">
+            <Button onClick={() => navigate(`/lessons/${exercise.lesson.course.courseId}`)} variant="outline">
               Retour aux leçons
             </Button>
             <Button onClick={() => {
@@ -362,7 +362,7 @@ const QCMExercise = () => {
         </Box>
 
         <Flex w="full" justify="space-between" align="center">
-          <Button onClick={() => navigate('/lessons')} variant="outline">
+          <Button onClick={() => navigate(`/lessons/${exercise.lesson.course.courseId}`)} variant="outline">
             Retour aux leçons
           </Button>
 
